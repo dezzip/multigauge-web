@@ -1,0 +1,366 @@
+:root {
+    --property-height: 30px;
+}
+
+.properties-panel { /* Grouped properties */
+    display: flex;
+    flex-direction: column;
+
+    padding-top: var(--common-padding);
+    padding-bottom: var(--common-padding);
+
+    border-bottom: var(--light-background-color) 1px solid;
+}
+
+.properties-header {
+    display: grid;
+    grid-column-gap: 10px;
+    height: 30px;
+
+    align-items: center;
+
+    padding-left: var(--common-padding);
+    padding-right: var(--common-padding);
+}
+
+.properties-header-label {
+    grid-area: label;
+}
+
+.properties-header-expand {
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.property-row-list { /* Vertical list of property rows */
+    display: flex;
+    flex-direction: column;
+}
+
+.property-row { /* Horizontal row of properties */
+    padding-left: var(--common-padding);
+    padding-right: var(--common-padding);
+
+    grid-column-gap: 10px;
+}
+
+.property-row.selected {
+    background-color: var(--accent-color);
+}
+
+.property { /* Single property */
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+
+    background-color: var(--light-background-color);
+    border-radius: var(--common-border-radius);
+
+    overflow: hidden;
+
+    box-shadow: 0 0 0 0 var(--light-background-color);
+    transition: box-shadow 0.15s ease;
+}
+
+.property:hover {
+    box-shadow: 0 0 0 0.5px var(--lightest-background-color);
+}
+
+.property:focus-within {
+    box-shadow: 0 0 0 1px var(--accent-color);
+}
+
+/* GRID TEMPLATES */
+
+.row-label {
+    font-size: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.row-label.first { grid-area: label1; }
+
+.row-label.second { grid-area: label2; }
+
+.row-input {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+.row-input.first { grid-area: input1; }
+
+.row-input.second { grid-area: input2; }
+
+.row-icon {
+    padding: var(--icon-padding);
+    width: 100%;
+    height: 100%;
+
+    background-color: none;
+    border-radius: var(--common-border-radius);
+
+    overflow: hidden;
+
+    transition: box-shadow 0.15s ease;
+}
+
+.row-icon img {
+    width: 100%;
+    height: 100%;
+}
+
+.row-icon:hover {
+    background-color: var(--light-background-color);
+}
+
+.row-icon:active {
+    background-color: var(--lightest-background-color);
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+.color-preview {
+    height: var(--property-height);
+    width: var(--property-height);
+    padding: 5px;
+}
+
+.gradient-preview {
+    height: var(--property-height);
+    flex: 1;
+    padding: 5px;
+}
+
+.color-swatch {
+    position: relative; /* Required for absolute positioning children */
+    width: 100%;
+    height: 100%;
+    border-radius: var(--common-border-radius);
+    border: 2px solid transparent;
+    overflow: hidden; /* Fix 'none' (invalid) and hide overflow from checkerboard */
+}
+
+.color-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.checkerboard {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 25%;
+    filter: grayscale(100%) brightness(0);
+    z-index: 0; /* Lower z-index to place it behind */
+}
+
+.input-and-unit {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    align-items: center;
+    min-width: 0;
+}
+
+.input-and-unit input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    background-color: transparent;
+    color: var(--text-color);
+}
+
+.input-and-unit span {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding-right: var(--common-padding);
+}
+
+.input-and-unit select {
+    height: 100%;
+
+    flex-shrink: 0; /* don't shrink select */
+    width: auto; /* or specify fixed width, e.g. 100px */
+}
+
+
+
+.unit-abbreviation {
+    display: flex;
+    border-left: var(--background-color) 1px solid;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+
+    transition: border-left 0.15s ease;
+}
+
+/* ✅ Correct way — use `:has()` if supported: */
+.unit-abbreviation:has(select:hover) {
+    border-left: var(--lightest-background-color) 1px solid;
+}
+
+.unit-abbreviation:has(select:focus) {
+    border-left: var(--accent-color) 1px solid;
+}
+
+.unit-abbreviation span {
+    padding: 0;
+    font-size: 12px;
+}
+
+.unit-abbreviation select {
+    padding: 0;
+    font-size: 12px;
+}
+
+
+
+.property-icon { /* The icon on the left of a property */
+    padding: 5px 0 5px 5px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.property-icon img {
+    aspect-ratio: 1/1;
+    height: 100%;
+}
+
+.property-icon label {
+    font-size: 100%;
+    padding: 3px;
+}
+
+
+
+.property-input { /* The input for a property */
+    display: flex;
+    flex: 1;
+    
+    height: 100%;
+    box-sizing: border-box;
+
+    overflow: hidden;
+}
+
+.property-input input, select { /* The input for a property */
+    height: 100%;
+    width: 100%;
+    flex: 1;
+    background-color: transparent;
+    color: var(--text-color);
+
+    border: none;
+}
+
+.property-input select:focus { /* The input for a property */
+    outline: none;
+}
+
+.object-property {
+    display: flex;
+    align-items: center;
+}
+
+
+
+
+.keyframe-position-input {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    border-right: var(--background-color) 1px solid;
+
+    align-items: center;
+}
+
+.keyframe-color-input {
+    display: flex;
+    flex: 3;
+    min-width: 0;
+}
+
+
+
+.property-color-picker {
+    display: flex;
+    flex-direction: column;
+    gap: var(--common-padding);
+    width: 100%;
+    padding-left: var(--common-padding);
+    padding-right: var(--common-padding);
+}
+
+.sat-light-square {
+    width: 100%;
+    aspect-ratio: 1/1;
+    position: relative;
+    cursor: crosshair;
+    border-radius: var(--common-border-radius);
+}
+
+.hue-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border: 4px solid white;
+    border-radius: 10px;
+    cursor: pointer;
+
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Firefox */
+.hue-slider::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border: 4px solid white;
+    border-radius: 10px;
+    cursor: pointer;
+
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.hue-slider {
+    width: 100%;
+    appearance: none;
+    height: 20px;
+    border-radius: 10px;
+    background: linear-gradient(to right, 
+        red, yellow, lime, cyan, blue, magenta, red);
+    outline: none;
+    border: none;
+}
+
+.sat-light-marker {
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    border: 4px solid white;
+    border-radius: 10px;
+    
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+.eyedropper-btn {
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 18px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: white;
+}

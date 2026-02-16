@@ -1,0 +1,58 @@
+#valueDisplayList {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+}
+
+.value-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 50px;
+}
+
+.value-display-graph {
+    background-color: var(--darkest-background-color);
+    border-radius: var(--common-border-radius);
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    box-shadow: 
+        inset 0 0 20px rgba(0, 0, 0, 0.5),
+        0 0 7px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.value-display-graph-ascii {
+    width: 100%;
+    height: 100%;
+    color: var(--accent-color);
+    text-shadow: 2px 2px 0 var(--dark-background-color);
+    margin: 0;
+    text-align: right;
+}
+
+.value-label-container {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.value-label-value {
+    color: var(--lightest-background-color);
+}
+
+.value-display-edit {
+    width: 20px;
+    height: 100%;
+    flex: 0 0 20px;
+}
+
+.value-display-edit img {
+    width: 100%;
+    aspect-ratio: 1;
+}

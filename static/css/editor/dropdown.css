@@ -1,0 +1,104 @@
+/*
+    The dropdowns are for select menus/right-click menus. Different from the context menus.
+*/
+
+#dropdownOverlay {
+    width: 100vw;
+    height: 100vh;
+
+    position: fixed;
+    
+    top: 0;
+    left: 0;
+
+    pointer-events: none;
+
+    z-index: 2000;
+}
+
+#dropdownOverlay.locked {
+    pointer-events: auto;
+}
+
+.dropdown {
+    width: 100%;
+    height: 100%;
+}
+
+.dropdown-button {
+    border: var(--light-background-color) 1px solid;
+    border-radius: var(--common-border-radius);
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--common-padding);
+}
+
+.dropdown-list {
+    pointer-events: all;
+    min-width: max-content;
+    white-space: nowrap;
+    position: absolute;
+
+    background-color: var(--dark-background-color);
+    border: var(--light-background-color) 1px solid;
+    border-radius: var(--common-border-radius);
+}
+
+.dropdown-item {
+    padding: 5px;
+    border-radius: var(--common-border-radius);
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: 12px;
+    gap: var(--common-padding);
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.dropdown-item.selected {
+    background-color: var(--accent-color);
+}
+
+.dropdown-item:hover:not(.disabled) {
+    background-color: var(--background-color);
+    cursor: auto;
+}
+
+.dropdown-item.stuck {
+    background-color: var(--background-color);
+}
+
+.dropdown-divider {
+    padding: 0;
+    height: 1px;
+    background-color: var(--light-background-color);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.dropdown-item-context {
+    color: var(--lightest-background-color);
+}
+
+.dropdown-search {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--background-color);
+    border-radius: var(--common-border-radius);
+    padding: 5px;
+}
+
+.disabled span {
+    color: var(--lightest-background-color);
+}

@@ -1,0 +1,30 @@
+.contextMenuContainer {
+    width: 100vw;
+    height: 100vh;
+
+    position: fixed;
+    
+    top: 0;
+    left: 0;
+
+    pointer-events: none;
+
+    z-index: 1000;
+}
+
+.context-menu {
+    position: absolute;
+
+    top: 100px;
+    left: 100px;
+
+    width: 250px;
+
+    pointer-events: all;
+
+    background-color: var(--background-color);
+
+    border: var(--light-background-color) 1px solid;
+    border-radius: var(--common-border-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}

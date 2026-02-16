@@ -1,0 +1,277 @@
+<html> 
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/navbar.css" /> 
+        <link rel="stylesheet" href="/static/css/editor-test.css" /> 
+        <link rel="stylesheet" href="/static/css/load.css">
+
+        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+
+        <!-- The Stylesheet -->
+        <link rel="stylesheet" href="/static/css/editor/tour.css"/>
+
+        <!-- The JS Script Tag -->
+        <script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js"></script>
+
+
+        <title>Editor</title>
+    </head>
+    <body> 
+        {% include 'load_screen.html' %}
+
+        <div class="contextMenuContainer"></div>
+
+        <div id="dropdownOverlay"></div>
+
+        <div class="editor-container">
+                
+            <div class="action-bar">
+                <div>
+                    <div id="actionMenu">
+
+                    </div>
+
+                    <h id="editorVersion">Editor v0.2.0-alpha</h>
+                </div>
+
+                <div>
+                    <h4 class = "title">GaugeFace</h4>
+                </div>
+
+                <div>
+                    <button class="icon" id="helpButton">
+                        <img src = "/static/images/help.png">
+                    </button>
+
+                    <button class="icon" id="undoButton">
+                        <img src = "/static/images/undo.png">
+                    </button>
+
+                    <button class="icon" id="redoButton">
+                        <img src = "/static/images/redo.png">
+                    </button>
+                </div>
+            </div>
+
+            <div class="editor">
+                <!-- Elements Panel -->
+                <div class="panel" id="leftPanel">
+                    <div class="panel-section" id="valuesPanel" style="height: 30%;">
+                        <h style='padding: 10px'>Values</h>
+                        <div id="valueDisplayList" class="scroll-container">
+
+                        </div>
+                    </div>
+
+                    <div class="panel-section scroll-container" id="elementList">
+                        <!-- Element hierarchy goes here -->
+                    </div>
+                </div>
+
+                <div class="resizer" id="resizerLeft"></div>
+
+                <!-- Canvas for GaugeFace -->
+                <div class="panel" id="gaugeFace">
+                    <pre class="aesthetic-ascii">
+@@@@@@@@@@@@@@@@%%%%%%#@%###******+++++++@#====------::::::......
+@╔══════════╗@@@%%%%%%#@%###******++++*@#======------::::::......
+@║MULTIGAUGE║@@%%%%%%%#@%###******+*%@*+======-------::::::......
+@╚══════════╝@%%%%%%%##@%##*****#@@*++++======-------::::::......
+@@@@@@@@@@@@@@%%%%%%###@###%@@%***++++++======------:::::::......
+@@@@@@@@@@@@%%%%%%%%%%%@##*******+%@#@*=======------::::::.......
+@@@@@@@@@@%%%%%%%%####@%#*******++%#+%#======-------::::::...... 
+%@@@@@@%%%%%%%%%%#####@#********++++++=======------:::::::...... 
+%@%%%%%%%%%%%%%######%%********++++++=======-------::::::....... 
+%%%%%%%%%%%%%########@#*******+++++++======-------::::::.......  
+%%%%%%%%%%##########@#******++++++++======-------:::::::.......  
+#%%%%#############*%@******++++++++=======-------::::::.......   
+################**#@*****++++++++========-------::::::.......    
+#############*****@*****++++++++=======--------:::::::.......    
+*#######*********@****++++++++========--------:::::::.......     
+****************@**++++++++++========--------:::::::.......      
+@%************%%+++++++++++========--------::::::::.......       
+**#@%******+*@*+++++++++==========--------:::::::........        
++**+*@%++++#@+++++++++==========--------::::::::........         
+++++++*@+*@*++++++===========----------::::::::........          
++++++++*@#++++=============----------::::::::.........           
+=++++*@*+@==============-----------:::::::::........             
+===#@+===@===========------------:::::::::.........              
+*@#======%*======-------------::::::::::.........                
+=========%+----------------:::::::::::.........                  
+--------=@--------------:::::::::::..........                    
+--------#*----------:::::::::::::..........                      
+-------##-----::::::::::::::::...........                        
+:--::-@+::::::::::::::::::.............                          
+:::-%#::::::::::::::::..............                             
+-@@=:::::::::::::................                                
+:::::::::.....................                                   
+..........................                                       
+....................                                             
+..............                                                   
+                    </pre>
+                    <canvas id="gaugeCanvas"></canvas>
+                    
+                    <div class="zoom">
+                        <span id="zoomSpan">Zoom: 1.00</span>
+                        <div class="zoom-buttons">
+                            <button class="zoom-button" id="zoomHome"><img src="/static/images/circular.png"></button>
+                            <button class="zoom-button" id="zoomIn"><img src="/static/images/add.png"></button>
+                            <button class="zoom-button" id="zoomOut"><img src="/static/images/subtract.png"></button>
+                        </div>
+                    </div>
+
+                    <!-- Toolbelt -->
+                    <div id="toolbelt">
+
+                        <div class="toolbelt-group">
+                            <div class="toolbelt-section">
+                                <button class="toolbelt-button hover-light" id="toolbeltAddElement" title="Add Element">
+                                    <img src="/static/images/add.png">
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="toolbelt-group">
+                            <div class="toolbelt-section">
+                                <button class="toolbelt-button hover-light" id="simulationPlayButton" title="Pause/Play Simulation">
+                                    <img src="/static/images/play.png" id="simulationPlayIcon">
+                            </div>
+
+                            <div class="toolbelt-divider"></div>
+
+                            <div class="toolbelt-section">
+                                <div style="display: flex;">
+                                    <button class="toolbelt-button hover-light" id="gridButton" title="Toggle Grid">
+                                        <img src="/static/images/grid.png">
+                                    <button class="toolbelt-button-options hover-light" id="gridOptionsButton" title="Grid Options" style="width: 10px; padding: 0;">
+                                        <img src="/static/images/down.png">
+                                </div>
+                                
+                                <div style="display: flex;">
+                                    <button class="toolbelt-button hover-light" id="snapButton" title="Toggle Snap">
+                                        <img src="/static/images/snap_off.png">
+                                    <button class="toolbelt-button-options hover-light" id="snapOptionsButton" title="Snap Options" style="width: 10px; padding: 0;">
+                                        <img src="/static/images/down.png">
+                                </div>
+                            </div>
+        
+                            <div class="toolbelt-divider"></div>
+
+                            <div class="toolbelt-section">
+                                <button class="toolbelt-button hover-light">
+                                    <img src="/static/images/grab_points_off.png">
+                            </div>
+                        </div>
+
+                        <div class="toolbelt-group" id="deleteGroup" style="background-color: var(--accent-color);">
+                            <div class="toolbelt-section">
+                                <button class="toolbelt-button hover-light" id="toolbeltRemoveElement">
+                                    <img src="/static/images/trash.png">
+                            </div>
+                        </div>
+
+                        <div id="toolbeltMenu">
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resizer" id="resizerRight"></div>
+
+                <!-- Properties Panel -->
+                <div class="panel" id="propertiesPanel">
+                    <div class="scroll-container">
+                        <div id="properties">
+                            <!-- Dynamic form fields for selected element's properties -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="changelogOverlay" class="changelog-overlay" style="display: none;">
+            <div class="changelog-modal">
+                <div class="flex-row changelog-header"> 
+                    <h1>Changelog</h1>
+                    <button onclick="closeChangelog()" class="icon">
+                        <img src="/static/images/close.png">
+                </div>
+                <div id="changelogList" class="scroll-container"></div>
+            </div>
+        </div>
+
+        <script src="/static/js/editor/editor.js" type="module"></script>
+        <script src="/static/js/editor/changelog.js" type="module"></script>
+
+        <script type="module">
+            function makeResizable(resizer, panelBefore, panelAfter, options = {}) {
+                let startX, startWidthBefore, startWidthAfter;
+
+                const minBefore = options.minBefore || 0;
+                const maxBefore = options.maxBefore || Infinity;
+                const minAfter = options.minAfter || 0;
+                const maxAfter = options.maxAfter || Infinity;
+
+                resizer.addEventListener("mousedown", function (e) {
+                    e.preventDefault();
+                    startX = e.clientX;
+                    startWidthBefore = panelBefore.getBoundingClientRect().width;
+                    startWidthAfter = panelAfter.getBoundingClientRect().width;
+
+                    document.addEventListener("mousemove", resize);
+                    document.addEventListener("mouseup", stopResize);
+                });
+
+                function resize(e) {
+                    const dx = e.clientX - startX;
+
+                    let newWidthBefore = startWidthBefore + dx;
+                    let newWidthAfter = startWidthAfter - dx;
+
+                    // Clamp values
+                    newWidthBefore = Math.max(minBefore, Math.min(maxBefore, newWidthBefore));
+                    newWidthAfter = Math.max(minAfter, Math.min(maxAfter, newWidthAfter));
+
+                    // Apply widths in pixels
+                    panelBefore.style.width = `${newWidthBefore}px`;
+                    panelAfter.style.width = `${newWidthAfter}px`;
+                }
+
+                function stopResize() {
+                    document.removeEventListener("mousemove", resize);
+                    document.removeEventListener("mouseup", stopResize);
+                }
+            }
+
+            // Initialize after DOM is ready
+            window.addEventListener("DOMContentLoaded", () => {
+                const leftPanel = document.getElementById("leftPanel");
+                const gaugeFace = document.getElementById("gaugeFace");
+                const rightPanel = document.getElementById("propertiesPanel");
+
+                const minPanel = 0.15 * window.innerWidth;
+                const maxPanel = 0.35 * window.innerWidth;
+
+                makeResizable(
+                    document.getElementById("resizerLeft"),
+                    leftPanel,
+                    gaugeFace,
+                    { minBefore: minPanel, maxBefore: maxPanel }
+                );
+
+                makeResizable(
+                    document.getElementById("resizerRight"),
+                    gaugeFace,
+                    rightPanel,
+                    { minAfter: minPanel, maxAfter: maxPanel }
+                );
+            });
+
+        </script>
+
+        <script src="/static/js/editor/tour.js" type="module"></script>
+
+    </body> 
+</html> 
