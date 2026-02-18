@@ -1,21 +1,80 @@
 :root {
-    /* Colors */
-    --text-color: #fffaf2; /* Floral White */
-    --accent-color: #ed1c24; /* Red */
-    --accent-color-hover: #ea6166; /* Red */
-    --lightest-background-color: #707078;
-    --light-background-color: #40424f;
-    --background-color: #31333d; /* Jet */
-    --dark-background-color: #242427; /* Raisin Black */
-    --darker-background-color: #1d1d20;
-    --darkest-background-color: #161618;
+    /* ===== NEO-BRUTAL COLOR PALETTE ===== */
+    --text-color: #1a1a2e;
+    --text-muted: #6b6b80;
+    --text-dim: #9a9ab0;
+    --accent-color: #6c5ce7;
+    --accent-color-hover: #5a4bd6;
+    --accent-color-dim: rgba(108, 92, 231, 0.1);
+    --accent-glow: rgba(108, 92, 231, 0.2);
+    --accent-secondary: #00cec9;
+    --accent-secondary-dim: rgba(0, 206, 201, 0.1);
+    --lavender: #b9b7ff;
+    --lavender-light: #e8e7ff;
+    --success-color: #2ecc71;
+    --success-bg: #d4edda;
+    --danger-color: #e74c3c;
+    --danger-bg: #fde8e8;
+    --warning-color: #f39c12;
+    --link-color: #6c5ce7;
 
-    --common-border-radius: 5px;
-    --common-padding: 10px;
-    --common-box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    /* Backgrounds — clean light tones */
+    --lightest-background-color: #ffffff;
+    --light-background-color: #f8f8fc;
+    --background-color: #f2f2f8;
+    --dark-background-color: #eeeef4;
+    --darker-background-color: #e8e8f0;
+    --darkest-background-color: #f8f8fc;
+    --glass-background: #ffffff;
+    --glass-border: #e0dfef;
+    --card-bg: #ffffff;
+    --card-border: #1a1a2e;
 
-    --common-font-family: 'Inter'; 
+    /* Brutal design tokens */
+    --brutal-border: 2px solid #1a1a2e;
+    --brutal-radius: 12px;
+    --brutal-shadow: 4px 4px 0 #1a1a2e;
+    --brutal-shadow-sm: 3px 3px 0 #1a1a2e;
+    --brutal-shadow-lg: 6px 6px 0 #1a1a2e;
+    --brutal-shadow-hover: 6px 6px 0 #1a1a2e;
+    --brutal-shadow-active: 1px 1px 0 #1a1a2e;
+    --brutal-shadow-light: 4px 4px 0 #e0dfef;
 
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 40px;
+    --space-2xl: 64px;
+    --space-3xl: 96px;
+
+    --common-padding: 12px;
+    --common-border-radius: 12px;
+    --common-box-shadow: var(--brutal-shadow);
+    --card-shadow: var(--brutal-shadow);
+    --glow-shadow: var(--brutal-shadow-hover);
+
+    /* Typography */
+    --common-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-size-xs: 11px;
+    --font-size-sm: 13px;
+    --font-size-base: 15px;
+    --font-size-lg: 18px;
+    --font-size-xl: 24px;
+    --font-size-2xl: 32px;
+    --font-size-3xl: 48px;
+    --font-size-4xl: 64px;
+
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 200ms ease;
+    --transition-slow: 400ms ease;
+    --transition-spring: 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    /* Layout */
+    --navbar-height: 64px;
+    --max-width: 1200px;
     --button-size: 35px;
     --mini-button-size: 20px;
     --icon-padding: 5px;

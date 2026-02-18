@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+        <title>Configure {{ device.name or device.hardware_id }}</title>
+        <style>
+            .config-card {
+                background-color: var(--darker-background-color);
+                border-radius: var(--common-border-radius);
+                padding: var(--common-padding);
+                margin-bottom: 10px;
+            }
+            .config-card h3 {
+                margin-bottom: 12px;
+                color: var(--accent-color);
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .config-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 6px 0;
+                gap: 10px;
+            }
+            .config-row label {
+                color: #aaa;
+                font-size: 13px;
+                flex: 1;
+                min-width: 120px;
+            }
+            .config-row input[type="color"] {
+                width: 40px;
+                height: 30px;
+                border: 2px solid var(--light-background-color);
+                border-radius: var(--common-border-radius);
+                cursor: pointer;
+                background: none;
+                padding: 2px;
+            }
+            .config-row input[type="number"],
+            .config-row input[type="text"] {
+                background-color: var(--dark-background-color);
+                border: 1px solid var(--light-background-color);
+                border-radius: var(--common-border-radius);
+                color: var(--text-color);
+                padding: 6px 10px;
+                font-size: 13px;
+                width: 100px;
+                font-family: inherit;
+            }
+            .config-row input[type="range"] {
+                flex: 1;
+                max-width: 150px;
+                accent-color: var(--accent-color);
+            }
+            .config-row select {
+                background-color: var(--dark-background-color);
+                border: 1px solid var(--light-background-color);
+                border-radius: var(--common-border-radius);
+                color: var(--text-color);
+                padding: 6px 10px;
+                font-size: 13px;
+                font-family: inherit;
+            }
+            .config-row .value-display {
+                min-width: 40px;
+                text-align: right;
+                color: var(--accent-color);
+                font-weight: 600;
+                font-size: 13px;
+            }
+            .toggle-switch {
+                position: relative;
+                display: inline-block;
+                width: 44px;
+                height: 24px;
+            }
+            .toggle-switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .toggle-slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background-color: var(--light-background-color);
+                border-radius: 24px;
+                transition: background-color 0.3s;
+            }
+            .toggle-slider:before {
+                position: absolute;
+                content: '';
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                border-radius: 50%;
+                transition: transform 0.3s;
+            }
+            .toggle-switch input:checked + .toggle-slider {
+                background-color: var(--accent-color);
+            }
+            .toggle-switch input:checked + .toggle-slider:before {
+                transform: translateX(20px);
+            }
+            .btn-bar {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+                position: sticky;
+                bottom: 10px;
+                z-index: 50;
+            }
+            .btn-save {
+                flex: 2;
+                background-color: var(--accent-color);
+                color: var(--text-color);
+                padding: 12px;
+                border: none;
+                border-radius: var(--common-border-radius);
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                font-family: inherit;
+            }
+            .btn-reset-cfg {
+                flex: 1;
+                background-color: var(--light-background-color);
+                color: var(--text-color);
+                padding: 12px;
+                border: none;
+                border-radius: var(--common-border-radius);
+                cursor: pointer;
+                font-size: 14px;
+                font-family: inherit;
+            }
+            .status-msg {
+                text-align: center;
+                margin-top: 10px;
+                font-size: 13px;
+                min-height: 20px;
+                padding: 6px;
+                border-radius: var(--common-border-radius);
+                transition: all 0.3s;
+            }
+            .status-msg.success { color: #4CAF50; background-color: rgba(76, 175, 80, 0.1); }
+            .status-msg.error { color: #ff5252; background-color: rgba(255, 82, 82, 0.1); }
+            .config-note {
+                font-size: 12px;
+                color: #666;
+                margin-top: 6px;
+                padding: 6px 10px;
+                background-color: var(--dark-background-color);
+                border-radius: var(--common-border-radius);
+                border-left: 3px solid var(--accent-color);
+            }
+        </style>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <div class="page">
+            <div class="page-header">
+                <div class="page-header-content margined">
+                    <div class="title">
+                        <h1>CONFIGURE {{ (device.name or device.hardware_id) | upper }}</h1>
+                        <a href="{{ url_for('devices.view_device', device_id=device.id) }}">
+                            <button class="upload-button" style="background-color: var(--darker-background-color);">Back</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content margined">
+            <div class="flex-col" style="max-width: 600px;">
+
+                <!-- General -->
+                <div class="config-card">
+                    <h3>General</h3>
+                    <div class="config-row">
+                        <label>Language</label>
+                        <select id="language">
+                            <option value="0">Francais</option>
+                            <option value="1">English</option>
+                            <option value="2">Espanol</option>
+                        </select>
+                    </div>
+                    <div class="config-row">
+                        <label>Brightness</label>
+                        <input type="range" id="brightness" min="0" max="100" value="80">
+                        <span class="value-display" id="brightness_val">80</span>
+                    </div>
+                    <div class="config-row">
+                        <label>Welcome Word</label>
+                        <input type="text" id="welcome_word" maxlength="32">
+                    </div>
+                </div>
+
+                <!-- Speed Screen -->
+                <div class="config-card">
+                    <h3>Speedometer</h3>
+                    <div class="config-row">
+                        <label>Speed Unit</label>
+                        <select id="speed_unit">
+                            <option value="0">km/h</option>
+                            <option value="1">mph</option>
+                            <option value="2">knots</option>
+                        </select>
+                    </div>
+                    <div class="config-row">
+                        <label>Number Color</label>
+                        <input type="color" id="speed_number_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Unit Label Color</label>
+                        <input type="color" id="speed_unit_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Grid Color</label>
+                        <input type="color" id="speed_grid_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Car Color</label>
+                        <input type="color" id="speed_car_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Shadow Color</label>
+                        <input type="color" id="speed_shadow_color">
+                    </div>
+                </div>
+
+                <!-- Inclinometer -->
+                <div class="config-card">
+                    <h3>Inclinometer</h3>
+                    <div class="config-row">
+                        <label>Angle Color</label>
+                        <input type="color" id="tilt_angle_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Unit Label Color</label>
+                        <input type="color" id="tilt_unit_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Warning Threshold (deg)</label>
+                        <input type="number" id="tilt_warning_deg" min="5" max="80" step="1">
+                    </div>
+                    <div class="config-row">
+                        <label>Danger Color</label>
+                        <input type="color" id="danger_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Tilt Speed</label>
+                        <input type="range" id="tilt_speed" min="0.5" max="3.0" step="0.1">
+                        <span class="value-display" id="tilt_speed_val">1.0</span>
+                    </div>
+                </div>
+
+                <!-- Data Screen -->
+                <div class="config-card">
+                    <h3>Data Screen</h3>
+                    <div class="config-row">
+                        <label>Circle Color</label>
+                        <input type="color" id="data_circle_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Circle Dim</label>
+                        <input type="color" id="data_circle_dim_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Circle Inner</label>
+                        <input type="color" id="data_circle_inner_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Bar Color</label>
+                        <input type="color" id="data_bar_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Center Color</label>
+                        <input type="color" id="data_center_color">
+                    </div>
+                </div>
+
+                <!-- Volt Gauge -->
+                <div class="config-card">
+                    <h3>Volt Gauge</h3>
+                    <div class="config-row">
+                        <label>Gauge Color</label>
+                        <input type="color" id="volt_gauge_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Warning Color</label>
+                        <input type="color" id="volt_warning_color">
+                    </div>
+                    <div class="config-row">
+                        <label>Warning Low (V)</label>
+                        <input type="number" id="volt_warning_low" min="8" max="18" step="0.1">
+                    </div>
+                    <div class="config-row">
+                        <label>Warning High (V)</label>
+                        <input type="number" id="volt_warning_high" min="8" max="18" step="0.1">
+                    </div>
+                    <div class="config-row">
+                        <label>Volt Simulation</label>
+                        <label class="toggle-switch"><input type="checkbox" id="volt_sim_enabled"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="config-row">
+                        <label>Sim Voltage (V)</label>
+                        <input type="range" id="volt_sim_value" min="8" max="18" step="0.1">
+                        <span class="value-display" id="volt_sim_val">12.8</span>
+                    </div>
+                </div>
+
+                <!-- RPM Gauge -->
+                <div class="config-card">
+                    <h3>RPM Gauge</h3>
+                    <div class="config-row">
+                        <label>RPM Simulation</label>
+                        <label class="toggle-switch"><input type="checkbox" id="rpm_sim_enabled"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="config-row">
+                        <label>Sim RPM</label>
+                        <input type="number" id="rpm_sim_value" min="0" max="10000" step="100">
+                    </div>
+                </div>
+
+                <!-- Sensors & Simulation -->
+                <div class="config-card">
+                    <h3>Sensors & Simulation</h3>
+                    <div class="config-row">
+                        <label>IMU Smoothing</label>
+                        <input type="number" id="imu_filter_tau" min="0.05" max="2.0" step="0.05">
+                    </div>
+                    <div class="config-row">
+                        <label>Speed Simulation</label>
+                        <label class="toggle-switch"><input type="checkbox" id="speed_sim_enabled"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="config-row">
+                        <label>Max Speed</label>
+                        <input type="number" id="speed_sim_max" min="50" max="500" step="10">
+                    </div>
+                    <div class="config-row">
+                        <label>Accel Rate</label>
+                        <input type="number" id="speed_sim_accel" min="5" max="200" step="5">
+                    </div>
+                    <div class="config-row">
+                        <label>Decel Rate</label>
+                        <input type="number" id="speed_sim_decel" min="5" max="200" step="5">
+                    </div>
+                </div>
+
+                <!-- WiFi AP -->
+                <div class="config-card">
+                    <h3>WiFi Access Point</h3>
+                    <div class="config-row">
+                        <label>SSID</label>
+                        <input type="text" id="wifi_ssid" maxlength="32">
+                    </div>
+                    <div class="config-row">
+                        <label>Password</label>
+                        <input type="text" id="wifi_password" maxlength="64">
+                    </div>
+                    <div class="config-row">
+                        <label>Channel</label>
+                        <input type="number" id="wifi_channel" min="1" max="13">
+                    </div>
+                    <p class="config-note">WiFi changes take effect after ESP32 reboot.</p>
+                </div>
+
+                <!-- Save / Reset -->
+                <div class="btn-bar">
+                    <button class="btn-save" onclick="saveConfig()">Save Configuration</button>
+                    <button class="btn-reset-cfg" onclick="resetConfig()">Reset Defaults</button>
+                </div>
+                <div class="status-msg" id="status"></div>
+
+                <a href="{{ url_for('devices.view_device', device_id=device.id) }}" style="margin-bottom: 20px;">
+                    <button class="upload-button" style="background-color: var(--darker-background-color); width: 100%;">Back to Device</button>
+                </a>
+            </div>
+        </div>
+
+        {% include 'footer.html' %}
+
+        <script>
+            var DEVICE_ID = {{ device.id }};
+            var CONFIG = {{ config | tojson }};
+            var DEFAULTS = {{ defaults | tojson }};
+
+            // Field definitions: id, type (c=color, n=number, s=select, b=bool, r=range, x=text)
+            var FIELDS = [
+                {i:'speed_unit', t:'s', k:'speed_unit'},
+                {i:'speed_number_color', t:'c', k:'speed_number_color'},
+                {i:'speed_unit_color', t:'c', k:'speed_unit_color'},
+                {i:'speed_grid_color', t:'c', k:'speed_grid_color'},
+                {i:'speed_car_color', t:'c', k:'speed_car_color'},
+                {i:'speed_shadow_color', t:'c', k:'speed_shadow_color'},
+                {i:'tilt_angle_color', t:'c', k:'tilt_angle_color'},
+                {i:'tilt_unit_color', t:'c', k:'tilt_unit_color'},
+                {i:'tilt_warning_deg', t:'n', k:'tilt_warning_deg'},
+                {i:'danger_color', t:'c', k:'danger_color'},
+                {i:'tilt_speed', t:'r', k:'tilt_speed'},
+                {i:'data_circle_color', t:'c', k:'data_circle_color'},
+                {i:'data_circle_dim_color', t:'c', k:'data_circle_dim_color'},
+                {i:'data_circle_inner_color', t:'c', k:'data_circle_inner_color'},
+                {i:'data_bar_color', t:'c', k:'data_bar_color'},
+                {i:'data_center_color', t:'c', k:'data_center_color'},
+                {i:'volt_gauge_color', t:'c', k:'volt_gauge_color'},
+                {i:'volt_warning_color', t:'c', k:'volt_warning_color'},
+                {i:'volt_warning_low', t:'n', k:'volt_warning_low'},
+                {i:'volt_warning_high', t:'n', k:'volt_warning_high'},
+                {i:'volt_sim_enabled', t:'b', k:'volt_sim_enabled'},
+                {i:'volt_sim_value', t:'r', k:'volt_sim_value'},
+                {i:'rpm_sim_enabled', t:'b', k:'rpm_sim_enabled'},
+                {i:'rpm_sim_value', t:'n', k:'rpm_sim_value'},
+                {i:'imu_filter_tau', t:'n', k:'imu_filter_tau'},
+                {i:'speed_sim_enabled', t:'b', k:'speed_sim_enabled'},
+                {i:'speed_sim_max', t:'n', k:'speed_sim_max'},
+                {i:'speed_sim_accel', t:'n', k:'speed_sim_accel'},
+                {i:'speed_sim_decel', t:'n', k:'speed_sim_decel'},
+                {i:'language', t:'s', k:'language'},
+                {i:'brightness', t:'r', k:'brightness'},
+                {i:'welcome_word', t:'x', k:'welcome_word'},
+                {i:'wifi_ssid', t:'x', k:'wifi_ssid'},
+                {i:'wifi_password', t:'x', k:'wifi_password'},
+                {i:'wifi_channel', t:'n', k:'wifi_channel'}
+            ];
+
+            function rgbToHex(r, g, b) {
+                return '#' + [r, g, b].map(function(x) { return x.toString(16).padStart(2, '0'); }).join('');
+            }
+
+            function hexToRgb(hex) {
+                var m = hex.match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+                return m ? {r: parseInt(m[1],16), g: parseInt(m[2],16), b: parseInt(m[3],16)} : {r:0, g:0, b:0};
+            }
+
+            function applyConfig(cfg) {
+                FIELDS.forEach(function(f) {
+                    var el = document.getElementById(f.i);
+                    if (!el) return;
+                    var val = cfg[f.k];
+                    if (val === undefined || val === null) val = DEFAULTS[f.k];
+
+                    if (f.t === 'c') {
+                        if (!val || val.r === undefined) val = DEFAULTS[f.k];
+                        el.value = rgbToHex(val.r, val.g, val.b);
+                    } else if (f.t === 'b') {
+                        el.checked = !!val;
+                    } else {
+                        el.value = val;
+                    }
+                });
+                // Update range displays
+                document.getElementById('brightness_val').textContent = cfg.brightness || 80;
+                document.getElementById('tilt_speed_val').textContent = cfg.tilt_speed || 1.0;
+                document.getElementById('volt_sim_val').textContent = parseFloat(cfg.volt_sim_value || 12.8).toFixed(1);
+            }
+
+            function collectConfig() {
+                var cfg = {};
+                FIELDS.forEach(function(f) {
+                    var el = document.getElementById(f.i);
+                    if (!el) return;
+                    if (f.t === 'c') cfg[f.k] = hexToRgb(el.value);
+                    else if (f.t === 'b') cfg[f.k] = el.checked;
+                    else if (f.t === 'x') cfg[f.k] = el.value;
+                    else cfg[f.k] = parseFloat(el.value);
+                });
+                return cfg;
+            }
+
+            function showStatus(msg, ok) {
+                var st = document.getElementById('status');
+                st.textContent = msg;
+                st.className = 'status-msg ' + (ok ? 'success' : 'error');
+                setTimeout(function() { st.textContent = ''; st.className = 'status-msg'; }, 3000);
+            }
+
+            function saveConfig() {
+                var cfg = collectConfig();
+                fetch('/devices/' + DEVICE_ID + '/configure/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(cfg)
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.status === 'ok') {
+                        CONFIG = data.config;
+                        showStatus('Configuration saved!', true);
+                    } else {
+                        showStatus('Error: ' + (data.error || 'Unknown'), false);
+                    }
+                })
+                .catch(function(e) { showStatus('Save failed: ' + e.message, false); });
+            }
+
+            function resetConfig() {
+                if (!confirm('Reset all settings to defaults?')) return;
+                fetch('/devices/' + DEVICE_ID + '/configure/reset', {
+                    method: 'POST'
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.status === 'ok') {
+                        CONFIG = data.config;
+                        applyConfig(CONFIG);
+                        showStatus('Reset to defaults!', true);
+                    } else {
+                        showStatus('Error: ' + (data.error || 'Unknown'), false);
+                    }
+                })
+                .catch(function(e) { showStatus('Reset failed: ' + e.message, false); });
+            }
+
+            // Range input live feedback
+            document.getElementById('brightness').addEventListener('input', function() {
+                document.getElementById('brightness_val').textContent = this.value;
+            });
+            document.getElementById('tilt_speed').addEventListener('input', function() {
+                document.getElementById('tilt_speed_val').textContent = this.value;
+            });
+            document.getElementById('volt_sim_value').addEventListener('input', function() {
+                document.getElementById('volt_sim_val').textContent = parseFloat(this.value).toFixed(1);
+            });
+
+            // Load config on page load
+            applyConfig(CONFIG);
+        </script>
+    </body>
+</html>

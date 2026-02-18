@@ -3,7 +3,7 @@ from flask_login import LoginManager
 from models import db, bcrypt, User, Product
 from datetime import datetime, timedelta
 
-from routes import auth_bp, cart_bp, main_bp, admin_bp, users_bp, payment_bp, workshop_bp, products_bp
+from routes import auth_bp, cart_bp, main_bp, admin_bp, users_bp, payment_bp, workshop_bp, products_bp, api_bp, devices_bp
 
 import stripe
 import os
@@ -14,6 +14,10 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "your_secret_key")
 
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
+
+app.config['FIRMWARE_UPLOAD_DIR'] = os.path.join(app.root_path, 'uploads', 'firmware')
+os.makedirs(app.config['FIRMWARE_UPLOAD_DIR'], exist_ok=True)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload
 
 '''###
 log = logging.getLogger('werkzeug')
@@ -39,6 +43,8 @@ app.register_blueprint(payment_bp)
 app.register_blueprint(products_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(workshop_bp)
+app.register_blueprint(api_bp)
+app.register_blueprint(devices_bp)
 
 # Run the application
 if __name__ == "__main__":
@@ -49,7 +55,7 @@ if __name__ == "__main__":
             admin_user = User(
                 username = "bluesq",
                 email = "test@gmail.com",
-                password = bcrypt.generate_password_hash("@dm1nP@ssw0rd!-Mult1G@ug3-"),
+                password = bcrypt.generate_password_hash("@dm1nP@ssw0rd!-Mult1G@ug3-").decode("utf-8"),
                 role = "admin"
             )
             db.session.add(admin_user)

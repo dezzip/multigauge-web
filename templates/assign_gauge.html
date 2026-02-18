@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+        <title>Assign Gauge - {{ device.name }}</title>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <div class="page">
+            <div class="page-header">
+                <div class="page-header-content margined">
+                    <div class="title">
+                        <h1>ASSIGN GAUGE TO {{ (device.name or device.hardware_id) | upper }}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content margined">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="p-common" style="background-color: #4a2d2d; border-radius: var(--common-border-radius); margin-bottom: 10px;">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('devices.assign_gauge', device_id=device.id) }}" method="POST">
+                <!-- Unassign option -->
+                <div class="p-common" style="margin-bottom: 15px;">
+                    <label class="flex-row items-center gap-common" style="cursor: pointer;">
+                        <input type="radio" name="post_id" value="" {{ 'checked' if not device.assigned_post_id }}>
+                        <span style="color: #aaa;">No gauge (unassign)</span>
+                    </label>
+                </div>
+
+                <!-- Gauge list -->
+                {% if posts %}
+                    <div class="flex-col gap-common">
+                        {% for post in posts %}
+                            <label class="flex-row items-center gap-common p-common" style="background-color: var(--background-color); border-radius: var(--common-border-radius); cursor: pointer; border: 2px solid {{ '#4fc3f7' if device.assigned_post_id == post.id else 'transparent' }};">
+                                <input type="radio" name="post_id" value="{{ post.id }}" {{ 'checked' if device.assigned_post_id == post.id }}>
+                                <div class="flex-col" style="flex: 1;">
+                                    <h3>{{ post.title }}</h3>
+                                    <p style="color: #aaa; font-size: 13px;">{{ post.gauge_type or 'Unknown type' }} &middot; {{ post.downloads }} downloads &middot; {{ post.total_likes() }} likes</p>
+                                </div>
+                            </label>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: #aaa;">No gauge faces available. Upload one in the Workshop first!</p>
+                {% endif %}
+
+                <br>
+                <button type="submit" class="upload-button w-full p-common">Save Assignment</button>
+            </form>
+
+            <br>
+            <a href="{{ url_for('devices.my_devices') }}">
+                <button class="upload-button" style="background-color: var(--darker-background-color);">Back to Devices</button>
+            </a>
+        </div>
+
+        {% include 'footer.html' %}
+    </body>
+</html>

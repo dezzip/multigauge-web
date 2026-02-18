@@ -1,0 +1,15 @@
+[Unit]
+Description=MultiGauge Gunicorn Flask App
+After=network.target
+
+[Service]
+User=dezzip
+Group=dezzip
+WorkingDirectory=/home/dezzip/multigauge
+ExecStart=/home/dezzip/multigauge/venv/bin/gunicorn --bind 127.0.0.1:5001 --workers 2 --timeout 120 app:app
+Restart=always
+RestartSec=5
+EnvironmentFile=/home/dezzip/multigauge/.env
+
+[Install]
+WantedBy=multi-user.target

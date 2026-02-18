@@ -1,102 +1,91 @@
 @import url("variables.css");
 
-/* navbar.css or global.css */
 .navbar {
-    background-color: var(--dark-background-color);
+    background: #fff;
     color: var(--text-color);
-    box-shadow: 0 -5px 20px black;
-    padding: 15px 0px;
+    border-bottom: 2px solid #1a1a2e;
+    padding: 0;
     top: 0;
     width: 100%;
     z-index: 1000;
     box-sizing: border-box;
-    flex: 0 0 auto;
-    height: 60px;
+    height: var(--navbar-height);
+    display: flex;
+    align-items: center;
+    transition: all var(--transition-normal);
 }
 
 .navbar-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    margin-left: 10%;
-    margin-right: 10%;
+    display: flex; justify-content: space-between; align-items: center;
+    width: 100%; max-width: var(--max-width);
+    margin: 0 auto; padding: 0 var(--space-lg);
 }
 
-.navbar ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    gap: 20px;
-}
-
-.navbar li {
-    display: flex;
-    align-items: center;
-}
+.navbar ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; align-items: center; }
+.navbar li { display: flex; align-items: center; }
 
 .navbar a {
-    color: var(--text-color);
-    transition: background-color 0.3s ease;
-
-    text-decoration: none;
-    border-radius: 4px;
-}
-
-.left-nav {
-    display: flex;
-    justify-content: flex-start;
-}
-
-.right-nav {
-    display: flex;
-    justify-content: flex-end;
+    color: var(--text-muted); transition: all var(--transition-normal);
+    text-decoration: none; padding: 8px 14px; border-radius: 8px;
+    font-size: var(--font-size-sm); font-weight: 600; position: relative;
 }
 
 .navbar a:hover {
-    background-color: var(--light-background-color);
+    color: var(--text-color);
+    background: var(--lavender-light);
 }
 
-.profile-menu {
-    position: relative;
-    display: inline-block;
+.left-nav { display: flex; justify-content: flex-start; }
+.right-nav { display: flex; justify-content: flex-end; }
+
+.nav-separator {
+    width: 2px; height: 18px; background: var(--glass-border);
+    margin: 0 var(--space-xs); border-radius: 1px;
 }
 
 .profile-btn {
-    padding: 0px;
-    background: none;
-    border: none;
+    padding: 0; background: none; border: 2px solid transparent;
+    cursor: pointer; border-radius: 50%; overflow: hidden;
+    transition: all var(--transition-normal); position: relative;
 }
+.profile-btn:hover { border-color: var(--accent-color); transform: scale(1.05); }
+.profile-btn img { border-radius: 50%; display: block; }
 
 .cart-button {
-    padding: 0px;
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
+    padding: 6px 10px; background: none; border: none;
+    display: flex; align-items: center; gap: var(--space-xs);
+    color: var(--text-muted); transition: all var(--transition-normal);
+    border-radius: 8px;
 }
+.cart-button:hover { color: var(--text-color); background: var(--lavender-light); }
+.cart-button h4 { font-size: var(--font-size-sm); font-weight: 600; }
 
 .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-    z-index: 1;
+    display: none; position: absolute; right: 0; top: calc(100% + 8px);
+    background: #fff; border: 2px solid #1a1a2e;
+    border-radius: var(--common-border-radius);
+    min-width: 200px; box-shadow: var(--brutal-shadow);
+    z-index: 1001; overflow: hidden;
+    animation: dropdownIn 0.2s ease;
+}
+
+@keyframes dropdownIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
+    color: var(--text-color); padding: 12px 18px;
+    text-decoration: none; display: block;
+    font-size: var(--font-size-sm); font-weight: 600;
+    transition: all var(--transition-fast);
+    border-left: 3px solid transparent;
 }
 
 .dropdown-content a:hover {
-    background-color: #ddd;
+    background: var(--lavender-light);
+    color: var(--text-color);
+    border-left-color: var(--accent-color);
 }
 
-.profile-menu:hover .dropdown-content {
-    display: block;
-}
+.profile-menu { position: relative; display: inline-block; }

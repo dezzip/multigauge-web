@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
+        <title>My Devices - MultiGauge</title>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <div class="page">
+            <div class="page-header">
+                <div class="page-header-content margined">
+                    <div class="title">
+                        <h1>My Devices</h1>
+                        <a href="{{ url_for('devices.register_device') }}">
+                            <button class="btn btn-primary">+ Register Device</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content margined">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="p-common" style="background-color: {{ 'var(--success-color)' if category == 'success' else 'var(--danger-color)' }}; border-radius: var(--common-border-radius); margin-bottom: var(--space-md);">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if devices %}
+                <div class="flex-col gap-common" style="padding: var(--space-md) 0;">
+                    {% for device in devices %}
+                        <div class="flex-row items-center justify-between p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
+                            <div class="flex-row items-center gap-common">
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ '#4CAF50' if device.is_online() else 'var(--text-dim)' }};"></div>
+                                <div class="flex-col">
+                                    <h3 style="font-size: var(--font-size-base); font-weight: 600;">{{ device.name or device.hardware_id }}</h3>
+                                    <p style="color: var(--text-dim); font-size: var(--font-size-xs);">{{ device.hardware_id }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex-col text-center">
+                                <p style="font-size: var(--font-size-xs); color: var(--text-dim);">Gauge</p>
+                                <p style="font-size: var(--font-size-sm);">{{ device.assigned_post.title if device.assigned_post else 'None' }}</p>
+                            </div>
+
+                            <div class="flex-col text-center">
+                                <p style="font-size: var(--font-size-xs); color: var(--text-dim);">Firmware</p>
+                                <p style="font-size: var(--font-size-sm);">{{ device.firmware_version or 'Unknown' }}</p>
+                            </div>
+
+                            <div class="flex-row gap-sm">
+                                <a href="{{ url_for('devices.configure_device', device_id=device.id) }}">
+                                    <button class="btn btn-primary btn-sm">Configure</button>
+                                </a>
+                                <a href="{{ url_for('devices.assign_gauge', device_id=device.id) }}">
+                                    <button class="btn btn-secondary btn-sm">Assign</button>
+                                </a>
+                                <a href="{{ url_for('devices.view_device', device_id=device.id) }}">
+                                    <button class="btn btn-ghost btn-sm">Details</button>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: var(--space-2xl) 0;">
+                    <p style="color: var(--text-muted);">No devices registered yet. Register your ESP32 to get started!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        {% include 'footer.html' %}
+    </body>
+</html>

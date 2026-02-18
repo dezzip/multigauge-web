@@ -1,35 +1,81 @@
 <!DOCTYPE html>
-<html> 
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/static/css/navbar.css" /> 
-        <link rel="stylesheet" href="/static/css/login.css" /> 
-        <title>Sign Up</title>
+        <link rel="stylesheet" href="/static/css/login.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
+        <title>Sign Up - MultiGauge</title>
     </head>
-    <body>
+    <body class="login-body">
         {% include 'navbar.html' %}
 
-        <div class="login-container">
-            <form method="POST">
-                <fieldset class="login">
-                    <legend>Sign Up</legend>
+        <!-- Animated background -->
+        <div class="login-bg">
+            <div class="login-bg-grid"></div>
+        </div>
+
+        <!-- Orbital rings -->
+        <div class="login-orbit login-orbit--1"></div>
+        <div class="login-orbit login-orbit--2"></div>
+        <div class="login-orbit login-orbit--3"></div>
+
+        <!-- Floating particles -->
+        <div class="login-particle" style="width:3px;height:3px;left:8%;animation-duration:10s;animation-delay:0s;"></div>
+        <div class="login-particle" style="width:2px;height:2px;left:22%;animation-duration:14s;animation-delay:2s;background:var(--accent-secondary);"></div>
+        <div class="login-particle" style="width:4px;height:4px;left:40%;animation-duration:12s;animation-delay:4s;"></div>
+        <div class="login-particle" style="width:2px;height:2px;left:55%;animation-duration:9s;animation-delay:1s;background:var(--accent-secondary);"></div>
+        <div class="login-particle" style="width:3px;height:3px;left:72%;animation-duration:11s;animation-delay:3s;"></div>
+        <div class="login-particle" style="width:2px;height:2px;left:85%;animation-duration:13s;animation-delay:5s;background:var(--accent-secondary);"></div>
+        <div class="login-particle" style="width:3px;height:3px;left:93%;animation-duration:10s;animation-delay:2s;"></div>
+
+        <!-- Floating geometric shapes -->
+        <div class="login-hex login-hex--diamond" style="left:15%;animation-duration:20s;animation-delay:2s;"></div>
+        <div class="login-hex login-hex--circle" style="left:40%;width:22px;height:22px;animation-duration:24s;animation-delay:5s;"></div>
+        <div class="login-hex login-hex--diamond" style="left:75%;width:26px;height:26px;animation-duration:19s;animation-delay:3s;"></div>
+        <div class="login-hex login-hex--circle" style="left:90%;animation-duration:23s;animation-delay:7s;"></div>
+
+        <div class="login-page">
+            <div class="login-card">
+                <div class="login-brandRow">
+                    <div class="login-brandDot"></div>
+                    <span class="login-brandName">MultiGauge</span>
+                </div>
+                <h2>Create account</h2>
+                <p class="login-subtitle">Already have an account? <a href="/login">Log in</a></p>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="login-flash" style="background-color: {{ '#d4edda' if category == 'success' else '#fff3cd' }};">
+                                <p>{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" class="login-form">
                     {{ form.hidden_tag() }}
 
-                    <span>Already have an account? <a href="/login">Log in</a></span>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        {{ form.username(placeholder="Choose a username") }}
+                    </div>
 
-                    <label for="username">Username</label>
-                    {{ form.username() }}
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        {{ form.email(placeholder="you@example.com") }}
+                    </div>
 
-                    <label for="email">Email</label>
-                    {{ form.email() }}
-                    
-                    <label for="password">Password</label>
-                    {{ form.password() }}
-                    
-                    <button type="submit">Register</button>
-                </fieldset>
-            </form>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        {{ form.password(placeholder="Create a password") }}
+                    </div>
+
+                    <button type="submit">Create Account</button>
+                </form>
+            </div>
         </div>
     </body>
 </html>

@@ -6,58 +6,124 @@
 }
 
 .cart-item {
-    height: 200px;
-    padding: var(--common-padding);
+    padding: var(--space-md);
     display: flex;
     align-items: stretch;
+    gap: var(--space-md);
+    min-height: 160px;
 }
 
-.product-image-container {
-    flex-shrink: 0;
+.cart-item + .cart-item {
+    border-top: 1px solid var(--glass-border);
+}
 
+.cart-item .product-image-container {
+    flex-shrink: 0;
     height: 100%;
     aspect-ratio: 1;
     overflow: hidden;
+    border-radius: var(--common-border-radius);
 }
 
-.product-image-container img {
+.cart-item .product-image-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.3s ease; 
+    transition: transform var(--transition-normal);
 }
 
-.product-image-container:hover img {
-    transform: scale(1.1);
+.cart-item .product-image-container:hover img {
+    transform: scale(1.05);
 }
 
-.product-info-container {
+.cart-item .product-info-container {
     flex-grow: 1;
-
-    padding: 10px;
+    padding: 0;
     box-sizing: border-box;
-
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
 .item-quantity-widget {
-    width: 50%;
-    display: flex;
-    justify-content: space-between;
-    background-color: var(--light-background-color);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: var(--common-border-radius);
-    padding: 10px;
-    gap: var(--common-border-radius);
+    padding: var(--space-sm) var(--space-md);
 }
+
+.item-quantity-widget button {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: var(--font-size-lg);
+    padding: 2px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color var(--transition-fast);
+}
+
+.item-quantity-widget button:hover {
+    background-color: var(--light-background-color);
+}
+
+.item-quantity-widget span {
+    font-weight: 600;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Cart summary */
+.cart-summary {
+    padding: var(--space-lg);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    margin-top: var(--space-lg);
+    backdrop-filter: blur(8px);
+}
+
+.cart-summary h2 {
+    margin-bottom: var(--space-md);
+}
+
+/* Order summary */
+.order-summary {
+    padding: var(--space-lg);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    margin-bottom: var(--space-md);
+    transition: all var(--transition-normal);
+}
+
+.order-summary:hover {
+    border-color: rgba(108, 92, 231, 0.15);
+    transform: translateX(4px);
+}
+
+.order-summary h2 {
+    font-size: var(--font-size-lg);
+}
+
+.order-summary p {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    margin-top: var(--space-xs);
+}
+
+/* Legacy overrides from cart.css */
+h2 { margin: 0; }
+h4 { margin: 0; }
 
 .price-row {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-
     gap: var(--common-padding);
 }
 
@@ -65,22 +131,14 @@
     position: absolute;
     top: 8px;
     left: 8px;
-    background-color: #e53935; /* Red badge */
+    background: linear-gradient(135deg, var(--accent-color), #8b7cf7);
     color: white;
-    padding: 4px 8px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    border-radius: 8px;
     z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-h2 {
-    margin: 0;
-}
-
-h4 {
-    margin: 0;
+    box-shadow: 0 4px 12px var(--accent-glow);
 }
 
 .product-info {
@@ -93,7 +151,14 @@ h4 {
 .add-to-cart-button {
     background-color: var(--accent-color);
     border-radius: var(--common-border-radius);
-    padding: var(--common-padding);
+    padding: 12px var(--space-md);
     border: none;
     color: var(--text-color);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.add-to-cart-button:hover {
+    background-color: var(--accent-color-hover);
 }

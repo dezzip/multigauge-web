@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+        <title>All Devices - Admin</title>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <div class="page">
+            <div class="page-header">
+                <div class="page-header-content margined">
+                    <div class="title">
+                        <h1>ALL DEVICES</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content margined">
+            {% if devices %}
+                <div class="flex-col gap-common">
+                    {% for device in devices %}
+                        <div class="flex-row items-center justify-between p-common" style="background-color: var(--background-color); border-radius: var(--common-border-radius);">
+                            <div class="flex-row items-center gap-common">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: {{ '#4CAF50' if device.is_online() else '#666' }};"></div>
+                                <div class="flex-col">
+                                    <h3>{{ device.name or device.hardware_id }}</h3>
+                                    <p style="color: #888; font-size: 13px;">{{ device.hardware_id }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex-col" style="text-align: center;">
+                                <p style="font-size: 13px; color: #aaa;">Owner</p>
+                                <a href="/user/{{ device.user.id }}" style="color: #4fc3f7;">{{ device.user.username }}</a>
+                            </div>
+
+                            <div class="flex-col" style="text-align: center;">
+                                <p style="font-size: 13px; color: #aaa;">Gauge</p>
+                                <p>{{ device.assigned_post.title if device.assigned_post else '—' }}</p>
+                            </div>
+
+                            <div class="flex-col" style="text-align: center;">
+                                <p style="font-size: 13px; color: #aaa;">Firmware</p>
+                                <p>{{ device.firmware_version or '—' }}</p>
+                            </div>
+
+                            <div class="flex-col" style="text-align: center;">
+                                <p style="font-size: 13px; color: #aaa;">Last Seen</p>
+                                <p>{{ device.last_seen_at.strftime('%Y-%m-%d %H:%M') if device.last_seen_at else 'Never' }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="p-common" style="text-align: center;">
+                    <p>No devices registered yet.</p>
+                </div>
+            {% endif %}
+
+            <br>
+            <a href="{{ url_for('admin.admin_dashboard') }}">
+                <button class="upload-button" style="background-color: var(--darker-background-color);">Back to Admin</button>
+            </a>
+        </div>
+
+        {% include 'footer.html' %}
+    </body>
+</html>

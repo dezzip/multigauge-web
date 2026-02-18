@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+        <title>Register Device</title>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <div class="page">
+            <div class="page-header">
+                <div class="page-header-content margined">
+                    <div class="title">
+                        <h1>REGISTER DEVICE</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content margined">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="p-common" style="background-color: #4a2d2d; border-radius: var(--common-border-radius); margin-bottom: 10px;">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="flex-row">
+                <div class="flex-col flex-2 justify-center">
+                    <form action="{{ url_for('devices.register_device') }}" method="POST" class="flex-col gap-common">
+                        <div class="flex-row items-center form-row">
+                            <label class="p-common">Hardware ID:</label>
+                            <input name="hardware_id" type="text" placeholder="e.g. AA:BB:CC:DD:EE:FF" required />
+                        </div>
+
+                        <div class="flex-row items-center form-row">
+                            <label class="p-common">Name (optional):</label>
+                            <input name="name" type="text" placeholder="e.g. Garage Gauge" />
+                        </div>
+
+                        <button class="p-common w-full" type="submit">Register</button>
+                    </form>
+                </div>
+
+                <div class="flex-1 p-common">
+                    <div class="p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
+                        <h3>How to find your Hardware ID</h3>
+                        <br>
+                        <p style="color: #aaa;">The Hardware ID is your ESP32's MAC address. You can find it by:</p>
+                        <br>
+                        <p style="color: #aaa;">1. Connecting your ESP32 via USB</p>
+                        <p style="color: #aaa;">2. Opening the Serial Monitor</p>
+                        <p style="color: #aaa;">3. The MAC address is printed on boot</p>
+                        <br>
+                        <p style="color: #aaa;">Format: <strong>AA:BB:CC:DD:EE:FF</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include 'footer.html' %}
+    </body>
+</html>

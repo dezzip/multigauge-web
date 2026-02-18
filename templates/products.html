@@ -1,25 +1,27 @@
-<html> 
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/static/css/style.css" /> 
-        <link rel="stylesheet" href="/static/css/product.css" /> 
-
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/product.css" />
         <link rel="stylesheet" href="/static/css/navbar.css" />
         <link rel="stylesheet" href="/static/css/footer.css" />
-
-        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-        <title>Workshop</title>
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
+        <title>Products - MultiGauge</title>
     </head>
-    <body> 
-        <!-- Navigation bar -->
+    <body>
         {% include 'navbar.html' %}
 
         <div class="page">
             <div class="page-header">
-                <div class = "page-header-content margined">
+                <div class="page-header-content margined">
                     <div class="title">
-                        <h1>PRODUCTS</h1>
+                        <div>
+                            <span style="font-size: var(--font-size-xs); text-transform: uppercase; letter-spacing: 3px; color: var(--accent-color); font-weight: 600;">Shop</span>
+                            <h1 style="margin-top: 4px;">Products</h1>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -28,10 +30,10 @@
                 {% if products %}
                     <div class="product-grid">
                         {% for product in products %}
-                        <a href="/products/{{ product.slug }}">
+                        <a href="/products/{{ product.slug }}" style="text-decoration: none; color: inherit;">
                             <div class="product">
                                 <div class="product-image-container">
-                                    <img src="{{ product.image_url }}" />
+                                    <img src="{{ product.image_url }}" alt="{{ product.name }}" />
                                     {% if product.is_discounted() %}
                                         <div class="discount-badge">
                                             {{ product.get_discount_percent() }}% Off
@@ -44,23 +46,23 @@
 
                                 <div class="product-info-container">
                                     <div class="product-info">
-                                        <h2>{{product.name}}</h2>
+                                        <h2 style="font-size: var(--font-size-xl); font-weight: 800;">{{ product.name }}</h2>
                                         <div class="price-row">
                                             {% if product.is_discounted() %}
-                                                <s><h4 style="font-weight: normal;">${{ product.price }}</h4></s>
-                                                <h4>${{ product.discount_price }}</h4>
+                                                <s style="color: var(--text-dim);">${{ product.price }}</s>
+                                                <h4 style="font-weight: 700; color: var(--accent-color);">${{ product.discount_price }}</h4>
                                             {% else %}
-                                                <h4>${{ product.price }}</h3>
+                                                <h4 style="font-weight: 700;">${{ product.price }}</h4>
                                             {% endif %}
                                             {% if product.is_low_stock() %}
-                                                <p class="low-stock-warning">Only {{product.stock}} left!</p>            
+                                                <p class="low-stock-warning">Only {{ product.stock }} left!</p>
                                             {% endif %}
                                         </div>
-                                        <h4>{{product.description}}</h4>
+                                        <p style="color: var(--text-muted); font-size: var(--font-size-sm); line-height: 1.6;">{{ product.description }}</p>
                                     </div>
 
                                     <form action="{{ url_for('cart.add_to_cart', product_id=product.id) }}" method="POST">
-                                        <button type="submit" class="add-to-cart-button">Add to cart</button>
+                                        <button type="submit" class="add-to-cart-button">Add to Cart</button>
                                     </form>
                                 </div>
                             </div>
@@ -68,16 +70,13 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p>No products found, come back later!</p>
+                    <div style="text-align: center; padding: var(--space-2xl) 0;">
+                        <p style="color: var(--text-muted); font-size: var(--font-size-lg);">No products found, come back later!</p>
+                    </div>
                 {% endif %}
             </div>
-
-            <br>
-
         </div>
 
-        <!-- Footer -->
         {% include 'footer.html' %}
-    </body> 
-
+    </body>
 </html>

@@ -2,218 +2,111 @@
 
 .post-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Flexible columns */
-    gap: var(--common-padding); /* Space between items */
-    padding: var(--common-padding); /* Padding around the grid */
-    color: var(--text-color);;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-md); padding: var(--space-md) 0;
+    color: var(--text-color);
 }
 
 .post {
-    background-color: var(--darkest-background-color);
-    border-radius: var(--common-border-radius);
-    
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    position: relative;
-    aspect-ratio: 1;
+    background: #fff; border: 2px solid #1a1a2e;
+    border-radius: 14px; overflow: hidden; position: relative;
+    aspect-ratio: 1; display: flex; flex-direction: column;
+    transition: all var(--transition-normal);
+    box-shadow: var(--brutal-shadow-light);
+}
 
-    display: flex;
-    flex-direction: column;
+.post:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--brutal-shadow-hover);
 }
 
 .post-view {
-    position: absolute;
-    top: 50%; /* Start at 30% from the top */
-    left: 50%;
-    transform: translate(-50%, -80%); /* Adjust the translate to match the starting position */
-    z-index: 1;
-    width: 60%; /* Initially 50% width of the post */
-    height: 60%; /* Initially 50% height of the post */
-    transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, transform 0.3s ease; /* Smooth transition for width, height, top, and transform */
-    padding: 0;
-    margin: 0;
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -80%); z-index: 1;
+    width: 60%; height: 60%;
+    transition: width var(--transition-normal), height var(--transition-normal),
+                top var(--transition-normal), transform var(--transition-normal);
+    padding: 0; margin: 0;
 }
 
-.post:hover .post-view {
-    width: 80%; /* Grow to 90% width on hover */
-    height: 80%; /* Grow to 90% height on hover */
-    transform: translate(-50%, -68.5%); /* Adjust the translate to center it */
-}
+.post:hover .post-view { width: 80%; height: 80%; transform: translate(-50%, -68.5%); }
 
 .post-info {
-    position: absolute;
-    bottom: 0; /* Stick to the bottom */
-    left: 0;
-
-    width: 100%;
-    height: 35%;
-    box-sizing: border-box;
-
-    background-color: var(--background-color);
+    position: absolute; bottom: 0; left: 0; width: 100%;
+    height: 35%; box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     padding: var(--common-padding);
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    transition: height 0.3s ease; /* Smooth transition for height */
-
-    z-index: 2;
+    display: flex; flex-direction: column; justify-content: space-between;
+    transition: height var(--transition-normal); z-index: 2;
+    border-top: 2px solid #1a1a2e;
 }
 
-/* Hover effect on the post */
-.post:hover .post-info {
-    height: 15%;
-}
+.post:hover .post-info { height: 15%; }
 
-.post h2 {
-    margin: 0;
-    color: var(--text-color);
-    padding: var(--common-padding);
-}
+.post h2 { margin: 0; color: var(--text-color); padding: var(--common-padding); }
 
-.post-stats {
-    display: flex;
-    justify-content: space-between;
-}
+.post-stats { display: flex; justify-content: space-between; }
 
-.post-stat {
-    display: flex;
-    align-items: center;
-}
+.post-stat { display: flex; align-items: center; gap: var(--space-xs); }
 
-.post-favorite {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    z-index: 10; /* Ensure it's above other content */
-}
+.post-favorite { position: absolute; bottom: 10px; right: 10px; z-index: 10; }
 
 .post-like {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    z-index: 10; /* Ensure it's above other content */
-    opacity: 0;
-    transition: right 0.3s ease, opacity 0.3s ease;
+    position: absolute; bottom: 10px; right: 10px; z-index: 10;
+    opacity: 0; transition: right var(--transition-normal), opacity var(--transition-normal);
 }
 
 .post-download {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    z-index: 10; /* Ensure it's above other content */
-    opacity: 0;
-    transition: right 0.2s ease, opacity 0.3s ease;
+    position: absolute; bottom: 10px; right: 10px; z-index: 10;
+    opacity: 0; transition: right 200ms ease, opacity var(--transition-normal);
 }
 
-.post:hover .post-like {
-right: 45px;
-opacity: 1;
-}
+.post:hover .post-like { right: 45px; opacity: 1; }
+.post:hover .post-download { right: 80px; opacity: 1; }
 
-.post:hover .post-download {
-    right: 80px;
-    opacity: 1;
-}
+.post-user { color: var(--text-muted); }
+.post-time { font-weight: 400; color: var(--text-dim); font-size: var(--font-size-sm); }
 
-.post-user {
-
-}
-
-.post-time {
-    font-weight: 10;
-}
-
-/* Initially, these stats should be visible */
-.post-stats, .post-user, .post-time {
-    opacity: 1;
-    transition: opacity 0.2s ease;
-}
+.post-stats, .post-user, .post-time { opacity: 1; transition: opacity 200ms ease; }
 
 .post:hover .post-stats,
 .post:hover .post-user,
-.post:hover .post-time {
-    opacity: 0; /* Hide the stats, user, and time on hover */
-}
+.post:hover .post-time { opacity: 0; }
 
-/* Hover effect on canvas to prevent overlap */
-.post:hover .post-view {
-    z-index: 0; /* Make sure canvas stays behind the info when hovered */
-}
+.post:hover .post-view { z-index: 0; }
 
-.post-filters {
-    display: flex;
-    gap: var(--common-padding);
-}
+.post-filters { display: flex; gap: var(--space-md); align-items: center; }
+.filter { display: flex; align-items: center; gap: var(--space-sm); }
+.filter h3 { font-size: var(--font-size-sm); font-weight: 600; color: var(--text-muted); }
 
-.filter {
-    display: flex;
-    align-items: center;
-    gap: var(--common-padding);
-}
+h3 { margin: 0; }
+h4 { margin: 0; font-weight: 400; }
+h5 { margin: 0; font-weight: 400; font-size: var(--font-size-sm); }
 
-h3 {
-    margin: 0;
-}
-
-h4 {
-    margin: 0;
-    font-weight: 10;
-}
-
-h5 {
-    margin: 0;
-    font-weight: 10;
-}
-
-/* Featured gauge's have a white glow */
-.featured {
-    box-shadow: 0 0 40px white;
-}
+/* Featured */
+.featured { box-shadow: var(--brutal-shadow); border-color: var(--accent-color); }
 
 .featured-banner {
-    position: absolute;
-    top: -60px;
-    left: -60px;
-    width: 60px;
-    height: 60px;
-    transform: rotate(45deg);
-    background: white;
-    transition: width 0.5s ease, height 0.5s ease; /* Smooth transition for height */
+    position: absolute; top: -60px; left: -60px;
+    width: 60px; height: 60px; transform: rotate(45deg);
+    background: var(--lavender); transition: width var(--transition-slow), height var(--transition-slow);
     z-index: 3;
 }
-
-.post:hover .featured-banner {
-    width: 120px;
-    height: 120px;
-}
+.post:hover .featured-banner { width: 120px; height: 120px; }
 
 .featured-star {
-    position: absolute;
-    z-index: 4;
-    filter: invert();
-    width: 50px;
-    height: 50px;
+    position: absolute; z-index: 4;
+    width: 50px; height: 50px;
     transform: translate(-50px, -50px) rotate(0deg);
-    transition: transform 0.5s ease, rotate 0.9s ease-out, width 0.15s ease, height 0.15s ease;
+    transition: transform var(--transition-slow), rotate 0.9s ease-out,
+                width var(--transition-fast), height var(--transition-fast);
 }
-
-.post:hover .featured-star {
-    transform: translate(0px, 0px) rotate(360deg);
-}
-
-.featured-star:hover {
-    width: 55px;
-    height: 55px;
-}
+.post:hover .featured-star { transform: translate(0px, 0px) rotate(360deg); }
+.featured-star:hover { width: 55px; height: 55px; }
 
 canvas {
-    /*
-    border-radius: 400px;
-    margin-top: 20px;
-    */ 
-    box-shadow: 0 0 20px black;
-    width: 100%; /* Ensures the canvas takes up the full width of its container */
-    height: 100%; /* Ensures the canvas takes up the full height of its container */
+    box-shadow: var(--brutal-shadow-sm);
+    width: 100%; height: 100%;
+    border-radius: 8px;
 }

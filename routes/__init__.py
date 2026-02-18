@@ -6,3 +6,5 @@ from .payment import payment_bp
 from .products import products_bp
 from .users import users_bp
 from .workshop import workshop_bp
+from .api import api_bp
+from .devices import devices_bp

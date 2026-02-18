@@ -1,27 +1,37 @@
 <!DOCTYPE html>
-<html> 
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="/static/css/style.css" /> 
-    <link rel="stylesheet" href="/static/css/navbar.css" /> 
-
-    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-
-    <title>Home</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/navbar.css" />
+    <link rel="stylesheet" href="/static/css/footer.css" />
+    <link rel="stylesheet" href="/static/css/common.css" />
+    <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
+    <title>{{ product.name }} - MultiGauge</title>
   </head>
-  <body> 
+  <body>
     {% include 'navbar.html' %}
 
-    <h1>{{product.name}}</h1> 
+    <div class="page">
+      <div class="page-header">
+        <div class="page-header-content margined">
+          <div class="title">
+            <h1>{{ product.name }}</h1>
+          </div>
+        </div>
+      </div>
 
-    <h3>{{product.description}}</h3> 
-
-    <form action="/create-checkout-session" method="POST">
-      <button type="submit">Test Checkout button</button>
-    </form>
+      <div class="page-content margined">
+        <div class="flex-col gap-lg" style="max-width: 700px; padding: var(--space-xl) 0;">
+          <p style="color: var(--text-muted); font-size: var(--font-size-lg);">{{ product.description }}</p>
+          <form action="/create-checkout-session" method="POST">
+            <button type="submit" class="btn btn-primary btn-lg">Checkout</button>
+          </form>
+        </div>
+      </div>
+    </div>
 
     {% include 'footer.html' %}
-  </body> 
-</html> 
+  </body>
+</html>

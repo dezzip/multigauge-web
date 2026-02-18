@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
+        <title>{{ device.name or device.hardware_id }} - MultiGauge</title>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <div class="page">
+            <div class="page-header">
+                <div class="page-header-content margined">
+                    <div class="title">
+                        <h1>{{ (device.name or device.hardware_id) | upper }}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content margined">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="p-common" style="background-color: {{ 'var(--success-color)' if category == 'success' else 'var(--danger-color)' }}; border-radius: var(--common-border-radius); margin-bottom: var(--space-md);">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="flex-col gap-common" style="max-width: 700px; padding: var(--space-md) 0;">
+                <div class="p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
+                    <h3 style="font-size: var(--font-size-lg);">Device Info</h3>
+                    <div class="flex-col gap-common" style="margin-top: var(--space-md);">
+                        <div class="flex-row justify-between">
+                            <p style="color: var(--text-muted);">Hardware ID</p>
+                            <p>{{ device.hardware_id }}</p>
+                        </div>
+                        <div class="flex-row justify-between">
+                            <p style="color: var(--text-muted);">Name</p>
+                            <p>{{ device.name or '—' }}</p>
+                        </div>
+                        <div class="flex-row justify-between items-center">
+                            <p style="color: var(--text-muted);">Status</p>
+                            <div class="flex-row items-center gap-sm">
+                                <div style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ '#4CAF50' if device.is_online() else 'var(--text-dim)' }};"></div>
+                                <p>{{ 'Online' if device.is_online() else 'Offline' }}</p>
+                            </div>
+                        </div>
+                        <div class="flex-row justify-between">
+                            <p style="color: var(--text-muted);">Firmware</p>
+                            <p>{{ device.firmware_version or 'Unknown' }}</p>
+                        </div>
+                        <div class="flex-row justify-between">
+                            <p style="color: var(--text-muted);">Last Seen</p>
+                            <p>{{ device.last_seen_at.strftime('%Y-%m-%d %H:%M') if device.last_seen_at else 'Never' }}</p>
+                        </div>
+                        <div class="flex-row justify-between">
+                            <p style="color: var(--text-muted);">Registered</p>
+                            <p>{{ device.registered_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
+                    <div class="flex-row justify-between items-center">
+                        <div>
+                            <h3 style="font-size: var(--font-size-lg);">Assigned Gauge</h3>
+                            <div style="margin-top: var(--space-sm);">
+                            {% if device.assigned_post %}
+                                <p><a href="/workshop/{{ device.assigned_post.id }}" style="color: var(--link-color);">{{ device.assigned_post.title }}</a></p>
+                            {% else %}
+                                <p style="color: var(--text-muted);">No gauge assigned</p>
+                            {% endif %}
+                            </div>
+                        </div>
+                        <a href="{{ url_for('devices.assign_gauge', device_id=device.id) }}">
+                            <button class="btn btn-secondary btn-sm">Change</button>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
+                    <div class="flex-row justify-between items-center">
+                        <div>
+                            <h3 style="font-size: var(--font-size-lg);">ESP Configuration</h3>
+                            <p style="color: var(--text-muted); margin-top: var(--space-sm);">Customize colors, speed units, sensors, WiFi and more.</p>
+                        </div>
+                        <a href="{{ url_for('devices.configure_device', device_id=device.id) }}">
+                            <button class="btn btn-primary btn-sm">Configure</button>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
+                    <h3 style="font-size: var(--font-size-lg);">API Token</h3>
+                    <div style="margin-top: var(--space-md);">
+                    {% if active_token %}
+                        <p style="color: var(--text-muted);">Active token ending in: <strong style="color: var(--text-color);">...{{ active_token.token[-8:] }}</strong></p>
+                        <p style="color: var(--text-dim); font-size: var(--font-size-xs); margin-top: var(--space-xs);">Created {{ active_token.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    {% else %}
+                        <p style="color: var(--accent-color);">No active token. Generate one below.</p>
+                    {% endif %}
+                    </div>
+                    <form action="{{ url_for('devices.regenerate_token', device_id=device.id) }}" method="POST" style="margin-top: var(--space-md);">
+                        <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('This will invalidate the current token. Your ESP32 will need to be updated. Continue?');">Regenerate Token</button>
+                    </form>
+                </div>
+
+                <div class="p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius); border: 1px solid var(--danger-color);">
+                    <div class="flex-row justify-between items-center">
+                        <div>
+                            <h3 style="color: var(--accent-color); font-size: var(--font-size-lg);">Danger Zone</h3>
+                            <p style="color: var(--text-muted); margin-top: var(--space-sm);">Permanently remove this device and revoke all tokens.</p>
+                        </div>
+                        <form action="{{ url_for('devices.delete_device', device_id=device.id) }}" method="POST">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure? This cannot be undone.');">Delete Device</button>
+                        </form>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('devices.my_devices') }}">
+                    <button class="btn btn-ghost" style="margin-top: var(--space-sm);">Back to Devices</button>
+                </a>
+            </div>
+        </div>
+
+        {% include 'footer.html' %}
+    </body>
+</html>

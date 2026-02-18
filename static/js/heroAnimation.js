@@ -51,10 +51,10 @@ document.addEventListener('DOMContentLoaded', function() {
         context.lineTo(x1, y1);
         context.lineWidth = thickness + lineWidth * 2;
         context.stroke();
-        context.strokeStyle = "black";
+        context.strokeStyle = "#0a0a18";
         context.lineWidth = thickness;
         context.stroke();
-        context.strokeStyle = "white";
+        context.strokeStyle = "rgba(108, 92, 231, 0.5)";
         context.lineWidth = lineWidth;
     }
 
@@ -134,12 +134,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const horizonHeight = height - 200;
 
-        context.fillStyle = "black";
+        context.fillStyle = "#0a0a18";
         context.fillRect(0, 0, width, height);
         context.lineCap = "round";
 
         context.lineWidth = lineWidth;
-        context.strokeStyle = "white";
+        context.strokeStyle = "rgba(108, 92, 231, 0.5)";
         
         const endAngleGauge = -135 * newModifier;
 

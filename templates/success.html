@@ -1,27 +1,42 @@
 <!DOCTYPE html>
-<html> 
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/static/css/navbar.css" /> 
-        <link rel="stylesheet" href="/static/css/login.css" /> 
-        <title>Log in</title>
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
+        <title>Order Confirmed - MultiGauge</title>
     </head>
-    <body> 
+    <body>
         {% include 'navbar.html' %}
 
-        <div class="login-container">
-            <h1>Thank You for Your Purchase!</h1>
-            <p>Your order has been received and is being processed.</p>
-            
-            {% if order_id %}
-                <p><strong>Order #{{ order_id }}</strong></p>
-            {% endif %}
+        <div class="page-content" style="min-height: calc(100vh - var(--navbar-height));">
+            <div class="margined" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: var(--space-2xl) 0; flex: 1;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background-color: var(--success-color); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-lg);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
 
-            <p>You will receive a confirmation email shortly.</p>
+                <h1 style="font-size: var(--font-size-2xl); margin-bottom: var(--space-sm);">Thank You!</h1>
+                <p style="color: var(--text-muted); font-size: var(--font-size-lg); margin-bottom: var(--space-sm);">Your order has been received and is being processed.</p>
 
-            <a href="/" class="btn">Return to Home</a>
-            <a href="/orders" class="btn">View My Orders</a>
+                {% if order_id %}
+                    <p style="font-weight: 600; margin-bottom: var(--space-sm);">Order #{{ order_id }}</p>
+                {% endif %}
+
+                <p style="color: var(--text-dim); margin-bottom: var(--space-xl);">You will receive a confirmation email shortly.</p>
+
+                <div class="flex-row gap-md">
+                    <a href="/" class="btn btn-primary">Return to Home</a>
+                    <a href="/orders" class="btn btn-secondary">View Orders</a>
+                </div>
+            </div>
         </div>
+
+        {% include 'footer.html' %}
     </body>
 </html>

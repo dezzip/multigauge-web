@@ -1,26 +1,24 @@
-<html> 
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/static/css/style.css" /> 
-        <link rel="stylesheet" href="/static/css/cart.css" /> 
-
-        <link rel="stylesheet" href="/static/css/navbar.css" /> 
-        <link rel="stylesheet" href="/static/css/footer.css" /> 
-
-        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-        <title>Workshop</title>
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/cart.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
+        <title>Cart - MultiGauge</title>
     </head>
-    <body> 
-        <!-- Navigation bar -->
+    <body>
         {% include 'navbar.html' %}
 
         <div class="page">
             <div class="page-header">
-                <div class = "page-header-content margined">
-                    <!-- Title and action-->
+                <div class="page-header-content margined">
                     <div class="title">
-                        <h1>CART</h1>
+                        <h1>Cart</h1>
                     </div>
                 </div>
             </div>
@@ -31,68 +29,65 @@
                 {% for item in cart.items %}
                     <div class="cart-item">
                         <div class="product-image-container">
-                            <img src="{{ item.product.image_url }}" />
+                            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" />
                         </div>
 
                         <div class="product-info-container">
-                            <div style="display: flex; justify-content: space-between;">
-                                <h2>{{ item.product.name }}</h2>
-
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <h2 style="font-size: var(--font-size-xl);">{{ item.product.name }}</h2>
                                 {% if item.product.discount_price %}
-                                    <h2><s>${{ item.product.price }}</s> → ${{ item.product.discount_price }}</h2>
+                                    <div class="flex-row items-center gap-sm">
+                                        <s style="color: var(--text-dim);">${{ item.product.price }}</s>
+                                        <h2 style="font-size: var(--font-size-xl);">${{ item.product.discount_price }}</h2>
+                                    </div>
                                 {% else %}
-                                    <h2>${{ item.product.price }}</h2>
+                                    <h2 style="font-size: var(--font-size-xl);">${{ item.product.price }}</h2>
                                 {% endif %}
                             </div>
 
-                            <div style="display: flex; justify-content: space-between;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div class="item-quantity-widget">
-                                    <!-- Decrement -->
                                     <form action="{{ url_for('cart.update_cart_quantity', item_id=item.id) }}" method="POST">
                                         <input type="hidden" name="action" value="decrement">
                                         <button type="submit">−</button>
                                     </form>
-
                                     <span>{{ item.quantity }}</span>
-
-                                    <!-- Increment -->
                                     <form action="{{ url_for('cart.update_cart_quantity', item_id=item.id) }}" method="POST">
                                         <input type="hidden" name="action" value="increment">
                                         <button type="submit">+</button>
                                     </form>
                                 </div>
 
-                                <!-- Remove -->
                                 <form action="{{ url_for('cart.update_cart_quantity', item_id=item.id) }}" method="POST">
                                     <input type="hidden" name="action" value="remove">
-                                    <button type="submit" style="background: none; border: none;">
-                                        <img src="/static/images/trash.png" style="height: 25px; aspect-ratio: 1;">
+                                    <button type="submit" style="background: none; border: none; cursor: pointer; opacity: 0.5; transition: opacity 150ms ease;">
+                                        <img src="/static/images/trash.png" style="height: 22px; aspect-ratio: 1;">
                                     </button>
                                 </form>
                             </div>
                         </div>
                     </div>
-
-                    <hr style="width: 100%;">
                 {% endfor %}
                 </div>
-                <div style="display: flex; justify-content: end;">
-                    <div style="text-align: right;">
-                        <h2>Subtotal: ${{cart.get_subtotal()}}</h2>
-                        <p>Shipping, taxes, and discount codes calculated at checkout.</p>
-                            <form action="/create-checkout-session" method="POST">
-                                <button type="submit">Check Out</button>
-                            </form>
+
+                <div style="display: flex; justify-content: flex-end; padding: var(--space-xl) 0;">
+                    <div class="cart-summary" style="min-width: 300px;">
+                        <h2 style="font-size: var(--font-size-xl);">Subtotal: ${{ cart.get_subtotal() }}</h2>
+                        <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin-top: var(--space-sm);">Shipping, taxes, and discount codes calculated at checkout.</p>
+                        <form action="/create-checkout-session" method="POST" style="margin-top: var(--space-md);">
+                            <button type="submit" class="btn btn-primary w-full">Check Out</button>
+                        </form>
                     </div>
                 </div>
             {% else %}
-                <p>Your cart is empty!</p>
+                <div style="text-align: center; padding: var(--space-2xl) 0;">
+                    <p style="color: var(--text-muted);">Your cart is empty!</p>
+                    <a href="/products" class="btn btn-ghost" style="margin-top: var(--space-md);">Browse Products</a>
+                </div>
             {% endif %}
             </div>
         </div>
 
-        <!-- Footer -->
         {% include 'footer.html' %}
-    </body> 
-
+    </body>
 </html>

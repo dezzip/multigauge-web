@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+        <title>Upload Firmware</title>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <div class="page">
+            <div class="page-header">
+                <div class="page-header-content margined">
+                    <div class="title">
+                        <h1>UPLOAD FIRMWARE</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content margined">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="p-common" style="background-color: #4a2d2d; border-radius: var(--common-border-radius); margin-bottom: 10px;">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="flex-col flex-2 justify-center" style="max-width: 600px;">
+                <form action="{{ url_for('admin.firmware_upload') }}" method="POST" enctype="multipart/form-data" class="flex-col gap-common">
+                    <div class="flex-row items-center form-row">
+                        <label class="p-common">Version:</label>
+                        <input name="version" type="text" placeholder="e.g. 1.0.0" required />
+                    </div>
+
+                    <div class="flex-row items-center form-row">
+                        <label class="p-common">Firmware (.bin):</label>
+                        <input name="firmware" type="file" accept=".bin" required />
+                    </div>
+
+                    <div class="flex-row items-center form-row">
+                        <label class="p-common">Release Notes:</label>
+                        <textarea name="notes" rows="4" placeholder="What's new in this version..."></textarea>
+                    </div>
+
+                    <button class="p-common w-full" type="submit">Upload</button>
+                </form>
+            </div>
+
+            <br>
+            <a href="{{ url_for('admin.firmware_list') }}">
+                <button class="upload-button" style="background-color: var(--darker-background-color);">Back to Firmware</button>
+            </a>
+        </div>
+
+        {% include 'footer.html' %}
+    </body>
+</html>

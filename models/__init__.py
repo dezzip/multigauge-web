@@ -10,3 +10,5 @@ from .cart import Cart, CartItem
 from .subscriber import EmailSubscribers
 from .product import Product
 from .order import Order, OrderItem, Address
+from .device import Device, DeviceToken
+from .firmware import Firmware

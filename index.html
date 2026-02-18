@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultiGauge - Advanced Vehicle Instrumentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f5f0eb;
+            --ink: #1a1a2e;
+            --lav: #b8a9e8;
+            --r: 12px;
+            --shadow: 4px 4px 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.6;
+        }
+
+        /* NAVBAR */
+        nav {
+            background: var(--bg);
+            border-bottom: 3px solid var(--ink);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav h1 {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--lav);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* HERO */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 80px 40px;
+            align-items: center;
+        }
+
+        .hero-content h2 {
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            color: #444;
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: transparent;
+            border: 2px solid var(--ink);
+            padding: 8px 16px;
+            border-radius: var(--r);
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge.accent {
+            background: var(--lav);
+            border-color: var(--lav);
+            color: #fff;
+            box-shadow: var(--shadow);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 3px solid var(--ink);
+            background: white;
+            color: var(--ink);
+            cursor: pointer;
+            border-radius: var(--r);
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+        }
+
+        .btn.primary {
+            background: var(--lav);
+            border-color: var(--lav);
+            color: #fff;
+            box-shadow: var(--shadow);
+        }
+
+        .btn.primary:hover {
+            box-shadow: 6px 6px 0 rgba(184, 169, 232, 0.4);
+        }
+
+        .hero-image {
+            background: white;
+            border: 3px solid var(--ink);
+            border-radius: var(--r);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            font-size: 60px;
+        }
+
+        /* FEATURES SECTION */
+        .features {
+            padding: 80px 40px;
+            background: white;
+            border-top: 3px solid var(--ink);
+            border-bottom: 3px solid var(--ink);
+        }
+
+        .section-title {
+            font-size: 40px;
+            font-weight: 900;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: var(--bg);
+            border: 3px solid var(--ink);
+            padding: 30px;
+            border-radius: var(--r);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        /* COMPATIBILITY */
+        .compatibility {
+            padding: 80px 40px;
+            background: var(--bg);
+        }
+
+        .compat-badges {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .compat-badge {
+            background: white;
+            border: 2px solid var(--ink);
+            padding: 15px 25px;
+            border-radius: var(--r);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .compat-badge.highlight {
+            background: var(--lav);
+            border-color: var(--lav);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        /* CTA SECTION */
+        .cta-section {
+            padding: 80px 40px;
+            background: white;
+            border-top: 3px solid var(--ink);
+        }
+
+        .cta-card {
+            background: var(--lav);
+            border: 3px solid var(--ink);
+            padding: 60px;
+            text-align: center;
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+        }
+
+        .cta-card h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .cta-card p {
+            font-size: 16px;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 30px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--ink);
+            color: var(--bg);
+            padding: 40px;
+            text-align: center;
+            font-size: 13px;
+            border-top: 3px solid var(--lav);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 40px 20px;
+            }
+
+            .hero-content h2 {
+                font-size: 36px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav ul {
+                gap: 15px;
+            }
+
+            .cta-card {
+                padding: 40px 20px;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav>
+        <h1>MultiGauge</h1>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#shop">Shop</a></li>
+            <li><a href="/login">Login</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="badge accent">⚡ Advanced Instrumentation</span>
+            <h2>Real-Time Vehicle Diagnostics</h2>
+            <p>Experience your vehicle like never before. MultiGauge transforms OBD-II data into stunning, interactive gauge faces with real-time telemetry.</p>
+            <div class="cta-buttons">
+                <a href="/register" class="btn primary">Get Started</a>
+                <a href="#features" class="btn">Learn More</a>
+            </div>
+        </div>
+
+        <div class="hero-image">
+            <span>📊</span>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <h2 class="section-title">Powerful Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-icon">📊</span>
+                <h3>OBD-II Connected</h3>
+                <p>Plug in and go. Works with any OBD-II scanner for instant access to your vehicle's data.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">💨</span>
+                <h3>Speed & RPM</h3>
+                <p>Crystal-clear analog gauges showing speed and RPM with smooth, responsive animations.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🔋</span>
+                <h3>Battery Health</h3>
+                <p>Monitor voltage levels and battery condition in real-time with precision readings.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">❄️</span>
+                <h3>Coolant & Oil</h3>
+                <p>Track engine temperatures with custom gauge faces designed for performance driving.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">⬆️</span>
+                <h3>Boost Pressure</h3>
+                <p>Dedicated boost gauge for turbo and supercharged vehicles. Real-time PSI display.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🌐</span>
+                <h3>Custom Faces</h3>
+                <p>Design your own gauge faces with our browser-based editor. Share with community.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">👥</span>
+                <h3>Community</h3>
+                <p>Browse thousands of gauge designs from the community. Rate, share, and collaborate.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🔄</span>
+                <h3>Live Updates</h3>
+                <p>OTA firmware updates keep your MultiGauge current with the latest features and fixes.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">⚙️</span>
+                <h3>Easy Install</h3>
+                <p>Simple plug-and-play setup. No coding required. Works with most vehicles.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMPATIBILITY -->
+    <section class="compatibility" id="shop">
+        <h2 class="section-title">Compatible With</h2>
+        <div class="compat-badges">
+            <div class="compat-badge">Toyota</div>
+            <div class="compat-badge highlight">Honda</div>
+            <div class="compat-badge">Ford</div>
+            <div class="compat-badge">BMW</div>
+            <div class="compat-badge highlight">Subaru</div>
+            <div class="compat-badge">Mazda</div>
+            <div class="compat-badge">Nissan</div>
+            <div class="compat-badge highlight">Mitsubishi</div>
+            <div class="compat-badge">And 100+ more...</div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="cta-card">
+            <h2>Ready to Transform Your Driving?</h2>
+            <p>Join thousands of enthusiasts using MultiGauge for real-time vehicle diagnostics and stunning visualizations.</p>
+            <a href="/register" class="btn primary">Get Your MultiGauge</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 MultiGauge. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a></p>
+    </footer>
+</body>
+</html>

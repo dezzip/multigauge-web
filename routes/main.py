@@ -1,12 +1,20 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, Response
 from flask_login import current_user
 from models import db, Post, User
+import os
 
 main_bp = Blueprint('main', __name__)
 
-# Home route
+# Home route - Landing page
 @main_bp.route("/")
 def home():
+    # Serve static landing page
+    index_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'index.html')
+    if os.path.exists(index_path):
+        with open(index_path, 'r') as f:
+            return Response(f.read(), mimetype='text/html')
+    
+    # Fallback to posts if index.html doesn't exist
     query = Post.query
 
     query.order_by(Post.posted_at.desc())

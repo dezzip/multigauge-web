@@ -1,87 +1,72 @@
 <!DOCTYPE html>
-<html> 
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="/static/css/footer.css" /> 
-    <link rel="stylesheet" href="/static/css/navbar.css" /> 
-
-    <link rel="stylesheet" href="/static/css/style.css" /> 
-    <link rel="stylesheet" href="/static/css/post.css" /> 
-
-    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-
-    <title>{{ user.username }}'s Page</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/post.css" />
+    <link rel="stylesheet" href="/static/css/navbar.css" />
+    <link rel="stylesheet" href="/static/css/footer.css" />
+    <link rel="stylesheet" href="/static/css/common.css" />
+    <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
+    <title>{{ user.username }} - MultiGauge</title>
   </head>
-  <body> 
-    <!-- Navigation bar -->
+  <body>
     {% include 'navbar.html' %}
 
     <div class="page">
       <div class="page-header">
-        <div class = "page-header-content margined">
-
+        <div class="page-header-content margined">
           <div class="title">
-
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-              <!-- Profile Picture-->
+            <div class="flex-row items-center gap-lg">
+              <img src="/static/images/gauge.png" width="80" height="80" style="border-radius: 50%; border: 2px solid var(--light-background-color);">
               <div>
-                <img src="/static/images/gauge.png" width="100px" height="100px">
-              </div>
-
-              <!-- Username-->
-              <div>
-                <h1>
+                <h1 style="font-size: var(--font-size-2xl);">
                   {% if user.role == "moderator" %}
-                    [mod] 
+                    <span style="color: var(--text-muted); font-size: var(--font-size-sm); font-weight: 500;">MOD</span>
                   {% elif user.role == "admin" %}
-                    [admin] 
+                    <span style="color: var(--accent-color); font-size: var(--font-size-sm); font-weight: 500;">ADMIN</span>
                   {% endif %}
                   {{ user.username }}
                 </h1>
               </div>
             </div>
 
-            <!-- Stats-->
-            <div>
-              <p>Total likes: {{total_likes}}</p>
-              <p>Joined: TEMP</p>
-              <p>Total Posts: {{ post_count }}</p>
+            <div class="flex-row gap-xl">
+              <div class="text-center">
+                <p style="font-size: var(--font-size-xl); font-weight: 600;">{{ total_likes }}</p>
+                <p style="color: var(--text-muted); font-size: var(--font-size-sm);">Likes</p>
+              </div>
+              <div class="text-center">
+                <p style="font-size: var(--font-size-xl); font-weight: 600;">{{ post_count }}</p>
+                <p style="color: var(--text-muted); font-size: var(--font-size-sm);">Posts</p>
+              </div>
             </div>
-
           </div>
         </div>
       </div>
     </div>
 
     <div class="page-content margined">
-      <!-- Display posts -->
       {% if user_posts %}
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h1>Newest posts</h1>
-          <a href="{{ url_for('workshop.workshop', user=user.id) }}">See all</a>
+        <div class="flex-row justify-between items-center" style="padding: var(--space-lg) 0 var(--space-sm);">
+          <h2 style="font-size: var(--font-size-xl);">Latest Posts</h2>
+          <a href="{{ url_for('workshop.workshop', user=user.id) }}" style="color: var(--accent-color); font-weight: 500;">See all</a>
         </div>
         <div class="post-grid">
-
           {% import 'macros/post_card.html' as post_macros %}
-
           {% for post in user_posts %}
             {{ post_macros.render_post(post, show_user=False) }}
           {% endfor %}
-
         </div>
-
       {% else %}
-
-        <p>No posts found!</p>
-
+        <div style="text-align: center; padding: var(--space-2xl) 0;">
+          <p style="color: var(--text-muted);">No posts yet.</p>
+        </div>
       {% endif %}
     </div>
-    
-    <!-- Footer -->
-    {% include 'footer.html' %}
 
+    {% include 'footer.html' %}
     <script src="/static/js/gaugePreview.js" type="module"></script>
-  </body> 
-</html> 
+  </body>
+</html>

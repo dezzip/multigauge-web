@@ -1,33 +1,145 @@
-<html> 
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/static/css/style.css" /> 
-        <link rel="stylesheet" href="/static/css/cart.css" /> 
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
+        <title>Admin - MultiGauge</title>
+        <style>
+            .admin-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-lg);
+                padding: var(--space-xl) 0;
+            }
 
-        <link rel="stylesheet" href="/static/css/navbar.css" /> 
-        <link rel="stylesheet" href="/static/css/footer.css" /> 
+            .admin-card {
+                background: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 16px;
+                padding: var(--space-xl);
+                transition: all var(--transition-normal);
+                position: relative;
+                overflow: hidden;
+                text-decoration: none;
+                color: inherit;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-md);
+            }
 
-        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-        <title>Workshop</title>
+            .admin-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, var(--accent-color), var(--accent-secondary));
+                opacity: 0;
+                transition: opacity var(--transition-normal);
+            }
+
+            .admin-card:hover {
+                border-color: rgba(108, 92, 231, 0.2);
+                transform: translateY(-4px);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-color-dim);
+            }
+
+            .admin-card:hover::before {
+                opacity: 1;
+            }
+
+            .admin-card-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+            }
+
+            .admin-card-icon.purple {
+                background: var(--accent-color-dim);
+            }
+
+            .admin-card-icon.teal {
+                background: var(--accent-secondary-dim);
+            }
+
+            .admin-card-icon.blue {
+                background: rgba(116, 185, 255, 0.12);
+            }
+
+            .admin-card h3 {
+                font-size: var(--font-size-xl);
+                font-weight: 700;
+            }
+
+            .admin-card p {
+                color: var(--text-muted);
+                font-size: var(--font-size-sm);
+            }
+
+            .admin-card .card-arrow {
+                color: var(--text-dim);
+                font-size: var(--font-size-lg);
+                transition: all var(--transition-normal);
+                margin-top: auto;
+            }
+
+            .admin-card:hover .card-arrow {
+                color: var(--accent-color);
+                transform: translateX(4px);
+            }
+        </style>
     </head>
-    <body> 
-        <!-- Navigation bar -->
+    <body>
         {% include 'navbar.html' %}
 
         <div class="page">
             <div class="page-header">
-                <div class = "page-header-content margined">
-                    <!-- Title and action-->
+                <div class="page-header-content margined">
                     <div class="title">
-                        <h1>ADMIN</h1>
+                        <div>
+                            <span style="font-size: var(--font-size-xs); text-transform: uppercase; letter-spacing: 3px; color: var(--accent-color); font-weight: 600;">Dashboard</span>
+                            <h1 style="margin-top: 4px;">Admin Panel</h1>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        {% include 'footer.html' %}
-    </body> 
+        <div class="page-content margined">
+            <div class="admin-grid">
+                <a href="{{ url_for('admin.orders') }}" class="admin-card">
+                    <div class="admin-card-icon purple">📦</div>
+                    <h3>Orders</h3>
+                    <p>View and manage customer orders, track shipments and process refunds.</p>
+                    <span class="card-arrow">&rarr;</span>
+                </a>
 
+                <a href="{{ url_for('admin.firmware_list') }}" class="admin-card">
+                    <div class="admin-card-icon teal">⚡</div>
+                    <h3>Firmware</h3>
+                    <p>Upload firmware updates and manage OTA deployments to devices.</p>
+                    <span class="card-arrow">&rarr;</span>
+                </a>
+
+                <a href="{{ url_for('admin.admin_devices') }}" class="admin-card">
+                    <div class="admin-card-icon blue">📡</div>
+                    <h3>Devices</h3>
+                    <p>Monitor all connected gauges, view diagnostics and device status.</p>
+                    <span class="card-arrow">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        {% include 'footer.html' %}
+    </body>
 </html>

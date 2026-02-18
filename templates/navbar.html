@@ -2,35 +2,39 @@
     <div class="navbar-container">
         <div class="left-nav">
             <ul>
-                <li><a href="/"><img src="/static/images/logo.svg" width="30px" height="30px"></a></li>
+                <li><a href="/"><img src="/static/images/logo.svg" width="28px" height="28px"></a></li>
                 <li><a href="/products">Products</a></li>
 
-                <li style="border-left: 1px solid #ccc; height: 25px; margin: 0;"></li>
+                <li><div class="nav-separator"></div></li>
 
                 <li><a href="/workshop">Workshop</a></li>
                 <li><a href="/editor">Editor</a></li>
 
-                {% if current_user.is_authenticated and current_user.is_admin() %}
-                    <li style="border-left: 1px solid #ccc; height: 25px; margin: 0;"></li>
+                {% if current_user.is_authenticated %}
+                    <li><div class="nav-separator"></div></li>
+                    <li><a href="/devices">Devices</a></li>
+                {% endif %}
 
+                {% if current_user.is_authenticated and current_user.is_admin() %}
+                    <li><div class="nav-separator"></div></li>
                     <li><a href="/admin">Admin</a></li>
                 {% endif%}
             </ul>
         </div>
 
-        <div class="right-nav">  
+        <div class="right-nav">
             <ul>
                 {% if current_user.is_authenticated %}
                 <li>
-                    <a href="/notifications">
-                        <img src="/static/images/no_notification.png" width="25px" height="25px">
+                    <a href="/notifications" style="display:flex; align-items:center; opacity: 0.5;">
+                        <img src="/static/images/no_notification.png" width="22px" height="22px">
                     </a>
                 </li>
                 {% endif %}
 
-                <li>
+                <li style="position: relative;">
                     <button class="profile-btn" onclick="toggleDropdown()">
-                        <img src="/static/images/default_pfp.jpg" width="25px" height="25px">
+                        <img src="/static/images/default_pfp.jpg" width="28px" height="28px">
                     </button>
 
                     <div class="dropdown-content">
@@ -46,19 +50,23 @@
                 </li>
 
                 <li>
-                    <a href="/cart" class="cart-button" href>
-                        <img src="/static/images/cart.png" width="25px" height="25px">
-                        <h4>1</h4>
+                    <a href="/cart" class="cart-button">
+                        <img src="/static/images/cart.png" width="22px" height="22px">
                     </a>
                 </li>
             </ul>
-        </div>  
+        </div>
     </div>
 </nav>
 
 <script>
     function toggleDropdown() {
-    const dropdown = document.querySelector('.dropdown-content');
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        const dropdown = document.querySelector('.dropdown-content');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     }
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.profile-btn') && !e.target.closest('.dropdown-content')) {
+            document.querySelector('.dropdown-content').style.display = 'none';
+        }
+    });
 </script>

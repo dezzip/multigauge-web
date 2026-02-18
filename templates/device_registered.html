@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+        <title>Device Registered</title>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <div class="page">
+            <div class="page-header">
+                <div class="page-header-content margined">
+                    <div class="title">
+                        <h1>DEVICE REGISTERED</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content margined">
+            <div class="flex-col gap-common" style="max-width: 700px;">
+                <div class="p-common" style="background-color: #2d4a2d; border-radius: var(--common-border-radius);">
+                    <p><strong>{{ device.name }}</strong> ({{ device.hardware_id }}) has been registered successfully!</p>
+                </div>
+
+                <div class="p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
+                    <h3>Your API Token</h3>
+                    <br>
+                    <p style="color: #ff9800;">This is the only time your full token will be shown. Copy it now and flash it to your ESP32.</p>
+                    <br>
+                    <div class="flex-row items-center gap-common">
+                        <code id="token-display" style="background-color: var(--background-color); padding: 12px; border-radius: var(--common-border-radius); word-break: break-all; flex: 1; font-size: 14px; font-family: monospace;">{{ token }}</code>
+                        <button onclick="copyToken()" id="copy-btn" class="upload-button" style="white-space: nowrap;">Copy</button>
+                    </div>
+                </div>
+
+                <div class="p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
+                    <h3>ESP32 Setup</h3>
+                    <br>
+                    <p style="color: #aaa;">Add this to your ESP32 code:</p>
+                    <br>
+                    <code style="background-color: var(--background-color); padding: 12px; border-radius: var(--common-border-radius); display: block; font-size: 13px; font-family: monospace; white-space: pre; overflow-x: auto;">#define API_TOKEN "{{ token }}"
+#define API_BASE  "https://your-domain.com/api/v1"</code>
+                </div>
+
+                <a href="{{ url_for('devices.my_devices') }}">
+                    <button class="upload-button w-full">Go to My Devices</button>
+                </a>
+            </div>
+        </div>
+
+        {% include 'footer.html' %}
+
+        <script>
+            function copyToken() {
+                const token = document.getElementById('token-display').textContent;
+                navigator.clipboard.writeText(token).then(() => {
+                    document.getElementById('copy-btn').textContent = 'Copied!';
+                    setTimeout(() => {
+                        document.getElementById('copy-btn').textContent = 'Copy';
+                    }, 2000);
+                });
+            }
+        </script>
+    </body>
+</html>

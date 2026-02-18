@@ -1,43 +1,59 @@
+@import url("variables.css");
+
 .comment-form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    min-height: 70px;
+    gap: var(--space-sm);
     width: 100%;
-    padding: var(--common-padding);
-    
-    background-color: var(--dark-background-color);
+    padding: var(--space-md);
+    background-color: var(--darker-background-color);
     border-radius: var(--common-border-radius);
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .comment-box {
     height: 80px;
     padding: var(--common-padding);
-
     border: none;
     resize: none;
     background-color: transparent;
-
     color: var(--text-color);
+    font-family: var(--common-font-family);
+    font-size: var(--font-size-base);
 }
 
 .comment-box:focus {
     outline: none;
 }
 
+.comment-box::placeholder {
+    color: var(--text-dim);
+}
+
 .comment-button {
     max-width: 100px;
-    padding: var(--common-padding);
-
+    padding: 8px var(--space-md);
     border: none;
-
     background-color: var(--accent-color);
     color: var(--text-color);
     border-radius: var(--common-border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.comment-button:hover {
+    background-color: var(--accent-color-hover);
 }
 
 .comment {
     width: 100%;
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.comment:last-child {
+    border-bottom: none;
 }
 
 #comments-section {
@@ -45,12 +61,12 @@
     flex-direction: column;
     width: 100%;
     max-width: 600px;
-    padding-top: 10px;
+    padding-top: var(--space-lg);
+    gap: var(--space-md);
 }
 
 #comments-list {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 10px;
 }

@@ -1,43 +1,91 @@
-<html> 
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/static/css/style.css" /> 
-        <link rel="stylesheet" href="/static/css/cart.css" /> 
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
+        <title>Orders - MultiGauge</title>
+        <style>
+            .order-card {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 14px;
+                padding: var(--space-lg);
+                transition: all var(--transition-normal);
+                text-decoration: none;
+                color: inherit;
+            }
 
-        <link rel="stylesheet" href="/static/css/navbar.css" /> 
-        <link rel="stylesheet" href="/static/css/footer.css" /> 
+            .order-card:hover {
+                border-color: rgba(108, 92, 231, 0.2);
+                transform: translateX(4px);
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-color-dim);
+            }
 
-        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-        <title>Orders</title>
+            .order-card h2 {
+                font-size: var(--font-size-lg);
+                font-weight: 700;
+            }
+
+            .order-card p {
+                color: var(--text-muted);
+                font-size: var(--font-size-sm);
+                margin-top: 4px;
+            }
+
+            .order-arrow {
+                color: var(--text-dim);
+                font-size: var(--font-size-xl);
+                transition: all var(--transition-normal);
+            }
+
+            .order-card:hover .order-arrow {
+                color: var(--accent-color);
+                transform: translateX(4px);
+            }
+        </style>
     </head>
-    <body> 
-        <!-- Navigation bar -->
+    <body>
         {% include 'navbar.html' %}
 
         <div class="page">
             <div class="page-header">
-                <div class = "page-header-content margined">
+                <div class="page-header-content margined">
                     <div class="title">
-                        <h1>ORDERS</h1>
+                        <div>
+                            <span style="font-size: var(--font-size-xs); text-transform: uppercase; letter-spacing: 3px; color: var(--accent-color); font-weight: 600;">Admin</span>
+                            <h1 style="margin-top: 4px;">Orders</h1>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="page-content margined">
-            {% for order in orders %}
-                <a href="/admin/orders/{{ order.id }}">
-                    <div class="order-summary">
-                        <h2>Order #{{ order.id }}</h2>
-                        <p>Status: {{ order.status }}</p>
+            <div class="flex-col gap-common" style="padding: var(--space-md) 0; max-width: 700px;">
+                {% for order in orders %}
+                    <a href="/admin/orders/{{ order.id }}" class="order-card">
+                        <div>
+                            <h2>Order #{{ order.id }}</h2>
+                            <p>Status: {{ order.status }}</p>
+                        </div>
+                        <span class="order-arrow">&rarr;</span>
+                    </a>
+                {% else %}
+                    <div style="text-align: center; padding: var(--space-2xl) 0;">
+                        <p style="color: var(--text-muted); font-size: var(--font-size-lg);">No orders yet.</p>
                     </div>
-                </a>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
 
-        <!-- Footer -->
         {% include 'footer.html' %}
-    </body> 
-
+    </body>
 </html>
