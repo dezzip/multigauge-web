@@ -10,6 +10,11 @@ class User(db.Model, UserMixin):
     email    = db.Column(db.String(150), unique=True, nullable=False) # User's email
     password = db.Column(db.String(256), nullable=False)              # User's password (hashed)
     role = db.Column(db.String(20), default="user")                  # User's role (admin, moderator, user)
+    language = db.Column(db.String(10), default='fr')                  # Preferred language
+    region   = db.Column(db.String(5), default='FR')                   # Region / country code
+    theme    = db.Column(db.String(20), default='light')               # UI theme
+    units    = db.Column(db.String(10), default='metric')              # Unit system
+    notifications_enabled = db.Column(db.Boolean, default=True)        # Email notifications
 
     def is_moderator(self):
         """Check if the user has moderator privileges"""

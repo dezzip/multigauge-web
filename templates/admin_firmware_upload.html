@@ -7,8 +7,15 @@
         <link rel="stylesheet" href="/static/css/navbar.css" />
         <link rel="stylesheet" href="/static/css/footer.css" />
         <link rel="stylesheet" href="/static/css/common.css" />
-        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
         <title>Upload Firmware</title>
+        <style>
+            @media (max-width: 640px) {
+                .form-row { flex-direction: column !important; }
+                .form-row label { max-width: 100% !important; flex: auto !important; }
+                .form-row input, .form-row textarea { flex: auto !important; }
+            }
+        </style>
     </head>
     <body>
         {% include 'navbar.html' %}

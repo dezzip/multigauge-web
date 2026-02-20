@@ -250,3 +250,18 @@ tr:hover td { background-color: var(--lavender-light); }
     background-size: 200% 100%; animation: shimmer 1.5s infinite;
     border-radius: var(--common-border-radius);
 }
+
+/* ===== GLOBAL RESPONSIVE ===== */
+@media (max-width: 640px) {
+    h1 { font-size: var(--font-size-2xl); }
+    .margined { padding-left: var(--space-md); padding-right: var(--space-md); }
+    .page-header-content { padding-top: var(--space-lg); padding-bottom: var(--space-md); }
+    .title { flex-wrap: wrap; gap: var(--space-sm); }
+    .form-row { flex-direction: column; }
+    .form-row label { flex: auto; max-width: 100%; margin-bottom: 4px; }
+    .form-row input, .form-row textarea, .form-row select { flex: auto; }
+    .btn { padding: 10px 18px; font-size: var(--font-size-sm); }
+    .btn-lg { padding: 14px 28px; font-size: var(--font-size-base); }
+    table { font-size: var(--font-size-sm); }
+    th, td { padding: 10px var(--space-sm); }
+}

@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="/static/css/navbar.css" />
         <link rel="stylesheet" href="/static/css/footer.css" />
         <link rel="stylesheet" href="/static/css/common.css" />
-        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
         <title>Configure {{ device.name or device.hardware_id }}</title>
         <style>
             .config-card {
@@ -163,6 +163,16 @@
                 background-color: var(--dark-background-color);
                 border-radius: var(--common-border-radius);
                 border-left: 3px solid var(--accent-color);
+            }
+            @media (max-width: 640px) {
+                .config-row { flex-wrap: wrap; }
+                .config-row label { min-width: 100%; margin-bottom: 4px; }
+                .config-row input[type="number"],
+                .config-row input[type="text"] { width: 100%; }
+                .config-row select { width: 100%; }
+                .config-row input[type="range"] { max-width: 100%; }
+                .btn-bar { flex-direction: column; }
+                .page-header-content .title { flex-direction: column; align-items: flex-start; gap: 12px; }
             }
         </style>
     </head>
@@ -377,6 +387,24 @@
                     <p class="config-note">WiFi changes take effect after ESP32 reboot.</p>
                 </div>
 
+                <!-- Bluetooth Direct Push -->
+                <div class="config-card" id="bleCard">
+                    <h3>Bluetooth Direct Push</h3>
+                    <p style="font-size:12px;color:#888;margin-bottom:12px;">
+                        Connect to your device via Bluetooth to push this configuration directly, without WiFi.
+                    </p>
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <button class="btn-save" id="bleConnectBtn" onclick="bleConnect()" style="flex:1;background-color:var(--light-background-color);">
+                            Connect via Bluetooth
+                        </button>
+                        <div style="width:10px;height:10px;border-radius:50%;background:var(--light-background-color);" id="bleDot"></div>
+                    </div>
+                    <button class="btn-save" id="blePushBtn" onclick="blePushConfig()" style="display:none;margin-top:10px;background-color:#4CAF50;">
+                        Push Config to Device
+                    </button>
+                    <div class="status-msg" id="bleStatus" style="margin-top:8px;"></div>
+                </div>
+
                 <!-- Save / Reset -->
                 <div class="btn-bar">
                     <button class="btn-save" onclick="saveConfig()">Save Configuration</button>
@@ -537,6 +565,125 @@
 
             // Load config on page load
             applyConfig(CONFIG);
+
+            // ===== BLE CONFIG PUSH =====
+            var DEZZIP_SERVICE_UUID   = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+            var CHAR_CONFIG_JSON_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26af';
+            var CHAR_BOARD_ID_UUID    = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+
+            var bleDevice = null;
+            var bleServer = null;
+            var bleService = null;
+
+            function setBleStatus(type, msg) {
+                var el = document.getElementById('bleStatus');
+                el.textContent = msg;
+                el.className = 'status-msg ' + type;
+                el.style.display = 'block';
+            }
+
+            async function bleConnect() {
+                if (!navigator.bluetooth) {
+                    setBleStatus('error', 'Bluetooth not supported. Use Chrome or Edge.');
+                    return;
+                }
+
+                var btn = document.getElementById('bleConnectBtn');
+                btn.disabled = true;
+                btn.textContent = 'Scanning...';
+                setBleStatus('info', 'Looking for Dezzip devices...');
+
+                try {
+                    bleDevice = await navigator.bluetooth.requestDevice({
+                        filters: [{ namePrefix: 'Dezzip' }],
+                        optionalServices: [DEZZIP_SERVICE_UUID]
+                    });
+
+                    bleDevice.addEventListener('gattserverdisconnected', function() {
+                        bleServer = null;
+                        bleService = null;
+                        document.getElementById('bleDot').style.background = '#ff5252';
+                        document.getElementById('blePushBtn').style.display = 'none';
+                        btn.disabled = false;
+                        btn.textContent = 'Reconnect';
+                        setBleStatus('error', 'Device disconnected.');
+                    });
+
+                    btn.textContent = 'Connecting...';
+                    bleServer = await bleDevice.gatt.connect();
+                    bleService = await bleServer.getPrimaryService(DEZZIP_SERVICE_UUID);
+
+                    // Read MAC to confirm it matches
+                    var macStr = '';
+                    try {
+                        var boardIdChar = await bleService.getCharacteristic(CHAR_BOARD_ID_UUID);
+                        var boardIdVal = await boardIdChar.readValue();
+                        macStr = new TextDecoder().decode(boardIdVal).trim().toUpperCase();
+                    } catch (e) {}
+
+                    document.getElementById('bleDot').style.background = '#4CAF50';
+                    document.getElementById('blePushBtn').style.display = 'block';
+                    btn.textContent = 'Connected: ' + (bleDevice.name || macStr);
+                    btn.disabled = true;
+                    setBleStatus('success', 'Connected! MAC: ' + (macStr || 'unknown'));
+
+                } catch (err) {
+                    btn.disabled = false;
+                    btn.textContent = 'Connect via Bluetooth';
+                    document.getElementById('bleDot').style.background = 'var(--light-background-color)';
+
+                    if (err.name === 'NotFoundError') {
+                        setBleStatus('error', 'No device selected.');
+                    } else {
+                        setBleStatus('error', err.message || 'Connection failed.');
+                    }
+                }
+            }
+
+            async function blePushConfig() {
+                if (!bleServer || !bleServer.connected || !bleService) {
+                    setBleStatus('error', 'Not connected. Click Connect first.');
+                    return;
+                }
+
+                var cfg = collectConfig();
+                var jsonStr = JSON.stringify(cfg);
+                var encoder = new TextEncoder();
+                var data = encoder.encode(jsonStr);
+
+                var pushBtn = document.getElementById('blePushBtn');
+                pushBtn.disabled = true;
+                pushBtn.textContent = 'Sending...';
+                setBleStatus('info', 'Pushing config (' + data.length + ' bytes)...');
+
+                try {
+                    var configChar = await bleService.getCharacteristic(CHAR_CONFIG_JSON_UUID);
+
+                    // BLE MTU is ~512, send in chunks if needed
+                    var CHUNK_SIZE = 480;
+                    if (data.length <= CHUNK_SIZE) {
+                        await configChar.writeValue(data);
+                    } else {
+                        // Send in chunks using prepare/execute write
+                        for (var offset = 0; offset < data.length; offset += CHUNK_SIZE) {
+                            var chunk = data.slice(offset, offset + CHUNK_SIZE);
+                            await configChar.writeValue(chunk);
+                        }
+                    }
+
+                    setBleStatus('success', 'Config pushed to device! It will apply immediately.');
+                    pushBtn.textContent = 'Push Config to Device';
+                    pushBtn.disabled = false;
+
+                    // Also save to server DB
+                    saveConfig();
+
+                } catch (err) {
+                    setBleStatus('error', 'Push failed: ' + (err.message || 'Unknown error'));
+                    pushBtn.textContent = 'Push Config to Device';
+                    pushBtn.disabled = false;
+                }
+            }
         </script>
     </body>
 </html>

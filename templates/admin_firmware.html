@@ -7,8 +7,24 @@
         <link rel="stylesheet" href="/static/css/navbar.css" />
         <link rel="stylesheet" href="/static/css/footer.css" />
         <link rel="stylesheet" href="/static/css/common.css" />
-        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-        <title>Firmware Management</title>
+        <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
+        <title>Firmware Management - Admin</title>
+        <style>
+            .fw-grid{display:flex;flex-direction:column;gap:12px;max-width:800px}
+            .fw-card{padding:20px 24px;background:var(--card-bg);border:var(--brutal-border);border-radius:var(--brutal-radius);box-shadow:var(--brutal-shadow-sm);display:flex;align-items:center;justify-content:space-between;gap:16px;transition:all .15s}
+            .fw-card:hover{box-shadow:var(--brutal-shadow-hover);transform:translate(-2px,-2px)}
+            .fw-card.active-fw{border-left:5px solid #4CAF50}
+            .fw-ver{font-size:22px;font-weight:800;color:var(--text-color)}
+            .fw-active-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7;margin-left:10px}
+            .fw-meta{font-size:12px;color:var(--text-muted);margin-top:4px}
+            .fw-notes{font-size:13px;color:var(--text-color);margin-top:6px;font-style:italic}
+            .fw-actions{display:flex;gap:6px;flex-shrink:0}
+            @media (max-width: 640px) {
+                .fw-card{flex-direction:column;align-items:flex-start;gap:12px}
+                .fw-actions{width:100%;justify-content:flex-end}
+                .page-header-content .title{flex-direction:column;align-items:flex-start;gap:12px}
+            }
+        </style>
     </head>
     <body>
         {% include 'navbar.html' %}
@@ -16,11 +32,12 @@
         <div class="page">
             <div class="page-header">
                 <div class="page-header-content margined">
-                    <div class="title">
-                        <h1>FIRMWARE</h1>
-                        <a href="{{ url_for('admin.firmware_upload') }}">
-                            <button class="upload-button">+ Upload Firmware</button>
-                        </a>
+                    <div class="title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                        <h1>Firmware</h1>
+                        <div style="display:flex;gap:8px;">
+                            <a href="{{ url_for('admin.firmware_upload') }}"><button class="btn btn-primary">+ Upload Firmware</button></a>
+                            <a href="{{ url_for('admin.admin_dashboard') }}"><button class="btn btn-ghost">← Back</button></a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -30,7 +47,7 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="p-common" style="background-color: {{ '#2d4a2d' if category == 'success' else '#4a2d2d' }}; border-radius: var(--common-border-radius); margin-bottom: 10px;">
+                        <div class="p-common" style="background-color: {{ 'var(--success-color)' if category == 'success' else 'var(--danger-color)' }}; border-radius: var(--common-border-radius); margin-bottom: var(--space-md);">
                             <p>{{ message }}</p>
                         </div>
                     {% endfor %}
@@ -38,49 +55,41 @@
             {% endwith %}
 
             {% if firmwares %}
-                <div class="flex-col gap-common">
+                <div class="fw-grid">
                     {% for fw in firmwares %}
-                        <div class="flex-row items-center justify-between p-common" style="background-color: var(--background-color); border-radius: var(--common-border-radius); border-left: 4px solid {{ '#4CAF50' if fw.is_active else 'transparent' }};">
-                            <div class="flex-col">
-                                <div class="flex-row items-center gap-common">
-                                    <h3>v{{ fw.version }}</h3>
-                                    {% if fw.is_active %}
-                                        <span style="background-color: #2d4a2d; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #4CAF50;">ACTIVE</span>
-                                    {% endif %}
+                        <div class="fw-card {{ 'active-fw' if fw.is_active }}">
+                            <div>
+                                <div>
+                                    <span class="fw-ver">v{{ fw.version }}</span>
+                                    {% if fw.is_active %}<span class="fw-active-badge">ACTIVE</span>{% endif %}
                                 </div>
-                                <p style="color: #aaa; font-size: 13px;">
-                                    {{ (fw.file_size / 1024) | round(1) }} KB &middot;
-                                    SHA256: {{ fw.checksum[:12] }}... &middot;
-                                    Uploaded {{ fw.uploaded_at.strftime('%Y-%m-%d %H:%M') }}
-                                </p>
+                                <div class="fw-meta">
+                                    {{ (fw.file_size / 1024) | round(1) }} KB · SHA256: {{ fw.checksum[:12] }}… · Uploaded {{ fw.uploaded_at.strftime('%d/%m/%Y %H:%M') }}
+                                </div>
                                 {% if fw.notes %}
-                                    <p style="color: #ccc; font-size: 13px; margin-top: 5px;">{{ fw.notes }}</p>
+                                    <div class="fw-notes">{{ fw.notes }}</div>
                                 {% endif %}
                             </div>
-
-                            <div class="flex-row gap-common">
+                            <div class="fw-actions">
                                 {% if not fw.is_active %}
                                     <form action="{{ url_for('admin.firmware_activate', firmware_id=fw.id) }}" method="POST">
-                                        <button type="submit" class="upload-button">Activate</button>
+                                        <button type="submit" class="btn btn-primary btn-sm">Activate</button>
                                     </form>
                                 {% endif %}
                                 <form action="{{ url_for('admin.firmware_delete', firmware_id=fw.id) }}" method="POST">
-                                    <button type="submit" class="upload-button" style="background-color: #4a2d2d;" onclick="return confirm('Delete firmware v{{ fw.version }}?');">Delete</button>
+                                    <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger-color);" onclick="return confirm('Delete firmware v{{ fw.version }}?');">Delete</button>
                                 </form>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="p-common" style="text-align: center;">
+                <div style="text-align:center;padding:60px 20px;color:var(--text-muted);">
+                    <div style="font-size:48px;margin-bottom:12px;">📦</div>
                     <p>No firmware uploaded yet.</p>
+                    <a href="{{ url_for('admin.firmware_upload') }}"><button class="btn btn-primary" style="margin-top:12px;">Upload First Firmware</button></a>
                 </div>
             {% endif %}
-
-            <br>
-            <a href="{{ url_for('admin.admin_dashboard') }}">
-                <button class="upload-button" style="background-color: var(--darker-background-color);">Back to Admin</button>
-            </a>
         </div>
 
         {% include 'footer.html' %}

@@ -1,6 +1,6 @@
 import os
 import hashlib
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
@@ -158,4 +158,36 @@ def admin_devices():
         return redirect(url_for('main.index'))
 
     devices = Device.query.order_by(Device.last_seen_at.desc().nullslast()).all()
-    return render_template("admin_devices.html", devices=devices)
+    firmwares = Firmware.query.order_by(Firmware.uploaded_at.desc()).all()
+
+    countries = sorted(set(d.country or 'FR' for d in devices))
+    fw_versions = sorted(set(d.firmware_version for d in devices if d.firmware_version))
+
+    return render_template("admin_devices.html", devices=devices, firmwares=firmwares,
+                           countries=countries, fw_versions=fw_versions)
+
+
+@admin_bp.route("/admin/devices/push-firmware", methods=['POST'])
+@login_required
+def push_firmware():
+    if not current_user.is_moderator():
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({'error': 'Invalid JSON'}), 400
+
+    device_ids = data.get('device_ids', [])
+    firmware_id = data.get('firmware_id')
+
+    fw = Firmware.query.get(firmware_id)
+    if not fw:
+        return jsonify({'error': 'Firmware not found'}), 404
+
+    updated = 0
+    for dev in Device.query.filter(Device.id.in_(device_ids)).all():
+        dev.firmware_version = fw.version
+        updated += 1
+    db.session.commit()
+
+    return jsonify({'status': 'ok', 'updated': updated, 'version': fw.version, 'device_ids': device_ids})

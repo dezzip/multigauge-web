@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="/static/css/navbar.css" />
+        <link rel="stylesheet" href="/static/css/footer.css" />
+        <link rel="stylesheet" href="/static/css/common.css" />
+        <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
+        <title>Settings - Dezzip</title>
+        <style>
+            .settings-layout{max-width:800px;display:flex;flex-direction:column;gap:20px;padding-bottom:40px}
+
+            .settings-card{background:var(--card-bg);border:var(--brutal-border);border-radius:var(--brutal-radius);box-shadow:var(--brutal-shadow-sm);overflow:hidden}
+            .settings-card-header{padding:18px 24px;border-bottom:var(--brutal-border);font-weight:700;font-size:16px;display:flex;align-items:center;gap:10px}
+            .settings-card-body{padding:24px}
+
+            .setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--glass-border)}
+            .setting-row:last-child{border-bottom:none}
+            .setting-label{display:flex;flex-direction:column;gap:2px}
+            .setting-label strong{font-size:14px;font-weight:600}
+            .setting-label span{font-size:12px;color:var(--text-muted)}
+
+            .setting-input{font-family:inherit;font-size:13px;padding:8px 14px;border:var(--brutal-border);border-radius:8px;background:var(--light-background-color);min-width:200px;box-sizing:border-box}
+            .setting-input:focus{border-color:var(--accent-color);outline:none}
+            .setting-select{font-family:inherit;font-size:13px;padding:8px 14px;border:var(--brutal-border);border-radius:8px;background:var(--light-background-color);min-width:200px;cursor:pointer}
+            .setting-select:focus{border-color:var(--accent-color);outline:none}
+
+            .toggle{position:relative;width:48px;height:26px;flex-shrink:0}
+            .toggle input{display:none}
+            .toggle-slider{position:absolute;inset:0;background:var(--glass-border);border-radius:26px;cursor:pointer;transition:all .2s;border:2px solid var(--card-border)}
+            .toggle-slider::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:var(--card-border);top:2px;left:2px;transition:all .2s}
+            .toggle input:checked+.toggle-slider{background:var(--accent-color);border-color:var(--accent-color)}
+            .toggle input:checked+.toggle-slider::after{transform:translateX(22px);background:#fff}
+
+            .pw-fields{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+            .pw-fields .setting-input{min-width:100%;width:100%}
+
+            .save-bar{display:flex;justify-content:flex-end;gap:8px;padding-top:12px;border-top:1px solid var(--glass-border);margin-top:8px}
+
+            .danger-zone{border-color:var(--danger-color)!important}
+            .danger-zone .settings-card-header{color:var(--danger-color)}
+
+            .toast{position:fixed;bottom:24px;right:24px;background:var(--card-bg);border:var(--brutal-border);border-radius:var(--brutal-radius);box-shadow:var(--brutal-shadow);padding:14px 22px;z-index:3000;display:none;font-size:14px;font-weight:600}
+            .toast.show{display:block;animation:toastIn .2s ease}
+            @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+            @media (max-width: 640px) {
+                .settings-card-header{padding:14px 16px;font-size:14px}
+                .settings-card-body{padding:16px}
+                .setting-row{flex-direction:column;align-items:flex-start;gap:10px}
+                .setting-input,.setting-select{min-width:100%;width:100%}
+                .toast{left:12px;right:12px;bottom:12px}
+            }
+        </style>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <div class="page">
+            <div class="page-header">
+                <div class="page-header-content margined">
+                    <div class="title"><h1>Settings</h1></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content margined">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="p-common" style="background-color: {{ 'var(--success-color)' if category == 'success' else 'var(--danger-color)' }}; border-radius: var(--common-border-radius); margin-bottom: var(--space-md);">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="settings-layout">
+
+                <!-- Account -->
+                <div class="settings-card">
+                    <div class="settings-card-header">👤 Account</div>
+                    <div class="settings-card-body">
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Username</strong>
+                                <span>Your unique display name</span>
+                            </div>
+                            <input class="setting-input" type="text" id="username" value="{{ current_user.username }}" disabled style="opacity:.6;cursor:not-allowed;">
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Email Address</strong>
+                                <span>Used for notifications and recovery</span>
+                            </div>
+                            <input class="setting-input" type="email" id="email" value="{{ current_user.email }}">
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Role</strong>
+                                <span>Your account permissions</span>
+                            </div>
+                            <span style="font-size:13px;font-weight:700;text-transform:uppercase;color:var(--accent-color);">{{ current_user.role }}</span>
+                        </div>
+                        <div class="save-bar">
+                            <button class="btn btn-primary btn-sm" onclick="saveAccount()">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="settings-card">
+                    <div class="settings-card-header">🔒 Change Password</div>
+                    <div class="settings-card-body">
+                        <div class="pw-fields">
+                            <input class="setting-input" type="password" id="currentPw" placeholder="Current password">
+                            <input class="setting-input" type="password" id="newPw" placeholder="New password (min 6 characters)">
+                            <input class="setting-input" type="password" id="confirmPw" placeholder="Confirm new password">
+                        </div>
+                        <div class="save-bar">
+                            <button class="btn btn-primary btn-sm" onclick="changePassword()">Update Password</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language & Region -->
+                <div class="settings-card">
+                    <div class="settings-card-header">🌍 Language & Region</div>
+                    <div class="settings-card-body">
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Language</strong>
+                                <span>Interface display language</span>
+                            </div>
+                            <select class="setting-select" id="language">
+                                <option value="fr" {{ 'selected' if (current_user.language or 'fr') == 'fr' }}>Français</option>
+                                <option value="en" {{ 'selected' if current_user.language == 'en' }}>English</option>
+                                <option value="de" {{ 'selected' if current_user.language == 'de' }}>Deutsch</option>
+                                <option value="es" {{ 'selected' if current_user.language == 'es' }}>Español</option>
+                                <option value="it" {{ 'selected' if current_user.language == 'it' }}>Italiano</option>
+                                <option value="pt" {{ 'selected' if current_user.language == 'pt' }}>Português</option>
+                                <option value="ja" {{ 'selected' if current_user.language == 'ja' }}>日本語</option>
+                                <option value="zh" {{ 'selected' if current_user.language == 'zh' }}>中文</option>
+                            </select>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Region</strong>
+                                <span>Used for date formats and units</span>
+                            </div>
+                            <select class="setting-select" id="region">
+                                <option value="FR" {{ 'selected' if (current_user.region or 'FR') == 'FR' }}>🇫🇷 France</option>
+                                <option value="US" {{ 'selected' if current_user.region == 'US' }}>🇺🇸 United States</option>
+                                <option value="GB" {{ 'selected' if current_user.region == 'GB' }}>🇬🇧 United Kingdom</option>
+                                <option value="DE" {{ 'selected' if current_user.region == 'DE' }}>🇩🇪 Germany</option>
+                                <option value="ES" {{ 'selected' if current_user.region == 'ES' }}>🇪🇸 Spain</option>
+                                <option value="IT" {{ 'selected' if current_user.region == 'IT' }}>🇮🇹 Italy</option>
+                                <option value="CH" {{ 'selected' if current_user.region == 'CH' }}>🇨🇭 Switzerland</option>
+                                <option value="BE" {{ 'selected' if current_user.region == 'BE' }}>🇧🇪 Belgium</option>
+                                <option value="CA" {{ 'selected' if current_user.region == 'CA' }}>🇨🇦 Canada</option>
+                                <option value="JP" {{ 'selected' if current_user.region == 'JP' }}>🇯🇵 Japan</option>
+                                <option value="BR" {{ 'selected' if current_user.region == 'BR' }}>🇧🇷 Brazil</option>
+                                <option value="AU" {{ 'selected' if current_user.region == 'AU' }}>🇦🇺 Australia</option>
+                            </select>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Unit System</strong>
+                                <span>Speed, temperature, and distance units</span>
+                            </div>
+                            <select class="setting-select" id="units">
+                                <option value="metric" {{ 'selected' if (current_user.units or 'metric') == 'metric' }}>Metric (km/h, °C)</option>
+                                <option value="imperial" {{ 'selected' if current_user.units == 'imperial' }}>Imperial (mph, °F)</option>
+                            </select>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Timezone</strong>
+                                <span>For timestamps and scheduling</span>
+                            </div>
+                            <select class="setting-select" id="timezone">
+                                <option value="Europe/Paris" selected>Europe/Paris (UTC+1)</option>
+                                <option value="Europe/London">Europe/London (UTC+0)</option>
+                                <option value="Europe/Berlin">Europe/Berlin (UTC+1)</option>
+                                <option value="America/New_York">America/New York (UTC-5)</option>
+                                <option value="America/Los_Angeles">America/Los Angeles (UTC-8)</option>
+                                <option value="Asia/Tokyo">Asia/Tokyo (UTC+9)</option>
+                            </select>
+                        </div>
+                        <div class="save-bar">
+                            <button class="btn btn-primary btn-sm" onclick="savePreferences()">Save Preferences</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appearance -->
+                <div class="settings-card">
+                    <div class="settings-card-header">🎨 Appearance</div>
+                    <div class="settings-card-body">
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Theme</strong>
+                                <span>Choose your interface theme</span>
+                            </div>
+                            <select class="setting-select" id="theme">
+                                <option value="light" {{ 'selected' if (current_user.theme or 'light') == 'light' }}>Light</option>
+                                <option value="dark" {{ 'selected' if current_user.theme == 'dark' }}>Dark</option>
+                                <option value="auto" {{ 'selected' if current_user.theme == 'auto' }}>Auto (System)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="settings-card">
+                    <div class="settings-card-header">🔔 Notifications</div>
+                    <div class="settings-card-body">
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Email Notifications</strong>
+                                <span>Receive firmware updates and alerts by email</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="notifEmail" {{ 'checked' if current_user.notifications_enabled != False }}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Device Offline Alerts</strong>
+                                <span>Get notified when a device goes offline</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="notifOffline" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Firmware Update Alerts</strong>
+                                <span>Get notified when new firmware is available</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="notifFirmware" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Community Notifications</strong>
+                                <span>Likes, comments, and new followers</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="notifCommunity" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="save-bar">
+                            <button class="btn btn-primary btn-sm" onclick="saveNotifications()">Save Notifications</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connected Devices summary -->
+                <div class="settings-card">
+                    <div class="settings-card-header">📡 Connected Devices</div>
+                    <div class="settings-card-body">
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Registered Devices</strong>
+                                <span>Manage from the Devices page</span>
+                            </div>
+                            <a href="/devices"><button class="btn btn-ghost btn-sm">View Devices →</button></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data & Privacy -->
+                <div class="settings-card">
+                    <div class="settings-card-header">🛡️ Data & Privacy</div>
+                    <div class="settings-card-body">
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Export My Data</strong>
+                                <span>Download all your account data as JSON</span>
+                            </div>
+                            <button class="btn btn-ghost btn-sm" onclick="showToast('📦 Export started...')">Export Data</button>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Profile Visibility</strong>
+                                <span>Allow other users to see your profile</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="profilePublic" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="settings-card danger-zone">
+                    <div class="settings-card-header">⚠️ Danger Zone</div>
+                    <div class="settings-card-body">
+                        <div class="setting-row">
+                            <div class="setting-label">
+                                <strong>Delete Account</strong>
+                                <span>Permanently delete your account and all associated data. This action cannot be undone.</span>
+                            </div>
+                            <button class="btn btn-sm" style="background:var(--danger-color);color:#fff;border:var(--brutal-border);" onclick="confirmDeleteAccount()">Delete My Account</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        {% include 'footer.html' %}
+
+        <script>
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function postJSON(url, data) {
+            return fetch(url, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(r => r.json());
+        }
+
+        function saveAccount() {
+            postJSON('/settings/account', {
+                email: document.getElementById('email').value
+            }).then(d => showToast(d.status === 'ok' ? '✅ Account updated' : '❌ ' + d.error));
+        }
+
+        function changePassword() {
+            const cur = document.getElementById('currentPw').value;
+            const pw = document.getElementById('newPw').value;
+            const conf = document.getElementById('confirmPw').value;
+            if (!cur || !pw) return showToast('❌ Fill in all fields');
+            if (pw.length < 6) return showToast('❌ Password must be at least 6 characters');
+            if (pw !== conf) return showToast('❌ Passwords do not match');
+            postJSON('/settings/password', {current: cur, password: pw})
+                .then(d => {
+                    showToast(d.status === 'ok' ? '✅ Password changed' : '❌ ' + d.error);
+                    if (d.status === 'ok') {
+                        document.getElementById('currentPw').value = '';
+                        document.getElementById('newPw').value = '';
+                        document.getElementById('confirmPw').value = '';
+                    }
+                });
+        }
+
+        function savePreferences() {
+            postJSON('/settings/preferences', {
+                language: document.getElementById('language').value,
+                region: document.getElementById('region').value,
+                units: document.getElementById('units').value,
+                theme: document.getElementById('theme').value
+            }).then(d => showToast(d.status === 'ok' ? '✅ Preferences saved' : '❌ ' + d.error));
+        }
+
+        function saveNotifications() {
+            postJSON('/settings/notifications', {
+                email_notifications: document.getElementById('notifEmail').checked
+            }).then(d => showToast(d.status === 'ok' ? '✅ Notification settings saved' : '❌ ' + d.error));
+        }
+
+        function confirmDeleteAccount() {
+            if (confirm('⚠️ Are you sure you want to delete your account? This CANNOT be undone.')) {
+                if (confirm('LAST WARNING: All your devices, gauges, and data will be permanently deleted.')) {
+                    showToast('Account deletion is not yet implemented.');
+                }
+            }
+        }
+        </script>
+    </body>
+</html>

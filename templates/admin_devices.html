@@ -7,8 +7,63 @@
         <link rel="stylesheet" href="/static/css/navbar.css" />
         <link rel="stylesheet" href="/static/css/footer.css" />
         <link rel="stylesheet" href="/static/css/common.css" />
-        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
         <title>All Devices - Admin</title>
+        <style>
+            .admin-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:var(--space-lg);padding:16px 20px;background:var(--card-bg);border:var(--brutal-border);border-radius:var(--brutal-radius);box-shadow:var(--brutal-shadow-sm)}
+            .admin-toolbar label{font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:.5px}
+            .admin-toolbar select,.admin-toolbar input{font-family:inherit;font-size:13px;padding:8px 12px;border:var(--brutal-border);border-radius:8px;background:var(--light-background-color);min-width:140px}
+            .admin-toolbar select:focus,.admin-toolbar input:focus{border-color:var(--accent-color);outline:none}
+
+            .filter-group{display:flex;flex-direction:column;gap:4px}
+
+            .stats-bar{display:flex;gap:16px;margin-bottom:var(--space-lg)}
+            .stat-card{flex:1;padding:16px 20px;background:var(--card-bg);border:var(--brutal-border);border-radius:var(--brutal-radius);box-shadow:var(--brutal-shadow-sm);text-align:center}
+            .stat-card .stat-num{font-size:28px;font-weight:800;color:var(--accent-color)}
+            .stat-card .stat-label{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-top:2px}
+
+            .dev-table{width:100%;border-collapse:collapse}
+            .dev-table th{text-align:left;padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);border-bottom:var(--brutal-border)}
+            .dev-table td{padding:12px 16px;border-bottom:1px solid var(--glass-border);font-size:13px}
+            .dev-table tr:hover td{background:var(--lavender-light)}
+            .dev-table .online-dot{width:10px;height:10px;border-radius:50%;display:inline-block;border:2px solid var(--card-border)}
+            .dev-table .online-dot.on{background:#4CAF50;box-shadow:0 0 6px rgba(76,175,80,.3)}
+            .dev-table .online-dot.off{background:var(--text-dim)}
+
+            .country-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;background:var(--lavender-light);color:var(--accent-color);border:1.5px solid var(--lavender)}
+            .fw-badge-sm{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7}
+
+            input[type="checkbox"].dev-check{width:16px;height:16px;cursor:pointer;accent-color:var(--accent-color)}
+
+            .push-section{margin-top:var(--space-lg);padding:20px;background:var(--card-bg);border:var(--brutal-border);border-radius:var(--brutal-radius);box-shadow:var(--brutal-shadow-sm)}
+            .push-section h3{margin:0 0 12px;font-size:16px}
+            .push-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+            .push-row select{font-family:inherit;font-size:13px;padding:8px 12px;border:var(--brutal-border);border-radius:8px;background:var(--light-background-color);min-width:200px}
+
+            .push-progress{width:100%;height:8px;background:var(--glass-border);border-radius:4px;overflow:hidden;margin-top:12px;display:none}
+            .push-progress-bar{height:100%;width:0%;background:var(--accent-color);border-radius:4px;transition:width .3s}
+            .push-status{font-size:13px;margin-top:8px;display:none}
+
+            .table-wrap{background:var(--card-bg);border:var(--brutal-border);border-radius:var(--brutal-radius);box-shadow:var(--brutal-shadow-sm);overflow:hidden}
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .stats-bar { flex-wrap:wrap; gap:10px; }
+                .stat-card { flex:1 1 calc(50% - 10px); min-width:120px; padding:12px 14px; }
+                .stat-card .stat-num { font-size:22px; }
+                .admin-toolbar { flex-direction:column; gap:12px; }
+                .admin-toolbar select, .admin-toolbar input { min-width:100%; }
+                .filter-group { width:100%; }
+                .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+                .dev-table { min-width:640px; }
+                .push-row { flex-direction:column; }
+                .push-row select { min-width:100%; }
+                .push-section { padding:16px; }
+            }
+            @media (max-width: 480px) {
+                .stat-card { flex:1 1 100%; }
+            }
+        </style>
     </head>
     <body>
         {% include 'navbar.html' %}
@@ -16,60 +71,229 @@
         <div class="page">
             <div class="page-header">
                 <div class="page-header-content margined">
-                    <div class="title">
-                        <h1>ALL DEVICES</h1>
+                    <div class="title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                        <h1>All Devices</h1>
+                        <a href="{{ url_for('admin.admin_dashboard') }}"><button class="btn btn-ghost">← Back to Admin</button></a>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="page-content margined">
-            {% if devices %}
-                <div class="flex-col gap-common">
-                    {% for device in devices %}
-                        <div class="flex-row items-center justify-between p-common" style="background-color: var(--background-color); border-radius: var(--common-border-radius);">
-                            <div class="flex-row items-center gap-common">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: {{ '#4CAF50' if device.is_online() else '#666' }};"></div>
-                                <div class="flex-col">
-                                    <h3>{{ device.name or device.hardware_id }}</h3>
-                                    <p style="color: #888; font-size: 13px;">{{ device.hardware_id }}</p>
-                                </div>
-                            </div>
-
-                            <div class="flex-col" style="text-align: center;">
-                                <p style="font-size: 13px; color: #aaa;">Owner</p>
-                                <a href="/user/{{ device.user.id }}" style="color: #4fc3f7;">{{ device.user.username }}</a>
-                            </div>
-
-                            <div class="flex-col" style="text-align: center;">
-                                <p style="font-size: 13px; color: #aaa;">Gauge</p>
-                                <p>{{ device.assigned_post.title if device.assigned_post else '—' }}</p>
-                            </div>
-
-                            <div class="flex-col" style="text-align: center;">
-                                <p style="font-size: 13px; color: #aaa;">Firmware</p>
-                                <p>{{ device.firmware_version or '—' }}</p>
-                            </div>
-
-                            <div class="flex-col" style="text-align: center;">
-                                <p style="font-size: 13px; color: #aaa;">Last Seen</p>
-                                <p>{{ device.last_seen_at.strftime('%Y-%m-%d %H:%M') if device.last_seen_at else 'Never' }}</p>
-                            </div>
-                        </div>
-                    {% endfor %}
+            <!-- Stats -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-num">{{ devices|length }}</div>
+                    <div class="stat-label">Total Devices</div>
                 </div>
-            {% else %}
-                <div class="p-common" style="text-align: center;">
-                    <p>No devices registered yet.</p>
+                <div class="stat-card">
+                    <div class="stat-num">{{ devices|selectattr('last_seen_at')|list|length }}</div>
+                    <div class="stat-label">Seen at least once</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-num">{{ countries|length }}</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num">{{ fw_versions|length }}</div>
+                    <div class="stat-label">Firmware versions</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="admin-toolbar">
+                <div class="filter-group">
+                    <label>Country</label>
+                    <select id="filterCountry" onchange="applyFilters()">
+                        <option value="">All countries</option>
+                        {% for c in countries %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Firmware</label>
+                    <select id="filterFw" onchange="applyFilters()">
+                        <option value="">All versions</option>
+                        {% for v in fw_versions %}<option value="{{ v }}">{{ v }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="filterStatus" onchange="applyFilters()">
+                        <option value="">All</option>
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" id="filterSearch" placeholder="Name or HW ID..." oninput="applyFilters()">
+                </div>
+                <div style="margin-left:auto;display:flex;gap:8px;align-items:flex-end;">
+                    <button class="btn btn-ghost btn-sm" onclick="selectAll()">Select All</button>
+                    <button class="btn btn-ghost btn-sm" onclick="selectNone()">Deselect</button>
+                </div>
+            </div>
+
+            <!-- Device Table -->
+            <div class="table-wrap">
+                <table class="dev-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;"><input type="checkbox" class="dev-check" id="checkAll" onchange="toggleAll(this)"></th>
+                            <th style="width:40px;">Status</th>
+                            <th>Device</th>
+                            <th>Owner</th>
+                            <th>Country</th>
+                            <th>Firmware</th>
+                            <th>Last Seen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devicesBody">
+                        {% for device in devices %}
+                        <tr class="dev-row" data-country="{{ device.country or 'FR' }}" data-fw="{{ device.firmware_version or '' }}" data-status="{{ 'online' if device.is_online() else 'offline' }}" data-name="{{ (device.name or '')|lower }} {{ device.hardware_id|lower }}" data-id="{{ device.id }}">
+                            <td><input type="checkbox" class="dev-check dev-select" value="{{ device.id }}"></td>
+                            <td><span class="online-dot {{ 'on' if device.is_online() else 'off' }}"></span></td>
+                            <td>
+                                <strong>{{ device.name or device.hardware_id }}</strong><br>
+                                <span style="color:var(--text-muted);font-size:11px;">{{ device.hardware_id }} · {{ device.module_type or 'ESP32-S3' }}</span>
+                            </td>
+                            <td><a href="/user/{{ device.user.id }}" style="color:var(--accent-color);font-weight:600;">{{ device.user.username }}</a></td>
+                            <td><span class="country-badge">{{ device.country or 'FR' }}</span></td>
+                            <td><span class="fw-badge-sm">{{ device.firmware_version or '—' }}</span></td>
+                            <td style="color:var(--text-muted);">{{ device.last_seen_at.strftime('%d/%m/%Y %H:%M') if device.last_seen_at else 'Never' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if not devices %}
+                <div style="text-align:center;padding:40px;color:var(--text-muted);">No devices registered yet.</div>
             {% endif %}
 
-            <br>
-            <a href="{{ url_for('admin.admin_dashboard') }}">
-                <button class="upload-button" style="background-color: var(--darker-background-color);">Back to Admin</button>
-            </a>
+            <!-- Push Firmware Section -->
+            <div class="push-section">
+                <h3>🚀 Push Firmware Update</h3>
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Select devices above, pick a firmware version, then push the update.</p>
+                <div class="push-row">
+                    <div class="filter-group">
+                        <label>Target firmware</label>
+                        <select id="pushFwSelect">
+                            {% for fw in firmwares %}
+                                <option value="{{ fw.id }}">v{{ fw.version }}{% if fw.is_active %} (active){% endif %}</option>
+                            {% endfor %}
+                            {% if not firmwares %}
+                                <option disabled>No firmware uploaded</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Quick select by country</label>
+                        <select id="pushCountry" onchange="selectByCountry(this.value)">
+                            <option value="">—</option>
+                            {% for c in countries %}<option value="{{ c }}">All {{ c }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Quick select by firmware</label>
+                        <select id="pushByFw" onchange="selectByFw(this.value)">
+                            <option value="">—</option>
+                            {% for v in fw_versions %}<option value="{{ v }}">All on {{ v }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="pushFirmware()">Push to Selected</button>
+                </div>
+                <div class="push-progress" id="pushProgress"><div class="push-progress-bar" id="pushBar"></div></div>
+                <div class="push-status" id="pushStatus"></div>
+            </div>
         </div>
 
         {% include 'footer.html' %}
+
+        <script>
+        // === FILTERS ===
+        function applyFilters() {
+            const country = document.getElementById('filterCountry').value;
+            const fw = document.getElementById('filterFw').value;
+            const status = document.getElementById('filterStatus').value;
+            const search = document.getElementById('filterSearch').value.toLowerCase();
+            document.querySelectorAll('.dev-row').forEach(row => {
+                let show = true;
+                if (country && row.dataset.country !== country) show = false;
+                if (fw && row.dataset.fw !== fw) show = false;
+                if (status && row.dataset.status !== status) show = false;
+                if (search && !row.dataset.name.includes(search)) show = false;
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        // === SELECT ===
+        function toggleAll(el) { document.querySelectorAll('.dev-select').forEach(c => { if (c.closest('tr').style.display !== 'none') c.checked = el.checked; }); }
+        function selectAll() { document.querySelectorAll('.dev-select').forEach(c => { if (c.closest('tr').style.display !== 'none') c.checked = true; }); }
+        function selectNone() { document.querySelectorAll('.dev-select').forEach(c => c.checked = false); }
+        function selectByCountry(country) {
+            if (!country) return;
+            selectNone();
+            document.querySelectorAll('.dev-row').forEach(row => {
+                if (row.dataset.country === country) row.querySelector('.dev-select').checked = true;
+            });
+        }
+        function selectByFw(fw) {
+            if (!fw) return;
+            selectNone();
+            document.querySelectorAll('.dev-row').forEach(row => {
+                if (row.dataset.fw === fw) row.querySelector('.dev-select').checked = true;
+            });
+        }
+
+        function getSelectedIds() {
+            return Array.from(document.querySelectorAll('.dev-select:checked')).map(c => parseInt(c.value));
+        }
+
+        // === PUSH FIRMWARE ===
+        function pushFirmware() {
+            const ids = getSelectedIds();
+            if (ids.length === 0) { alert('Select at least one device.'); return; }
+            const fwId = document.getElementById('pushFwSelect').value;
+            if (!fwId) { alert('Select a firmware version.'); return; }
+
+            const progress = document.getElementById('pushProgress');
+            const bar = document.getElementById('pushBar');
+            const status = document.getElementById('pushStatus');
+            progress.style.display = 'block';
+            status.style.display = 'block';
+            status.textContent = 'Pushing firmware to ' + ids.length + ' device(s)...';
+            status.style.color = 'var(--accent-color)';
+            bar.style.width = '0%';
+
+            fetch('/admin/devices/push-firmware', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({device_ids: ids, firmware_id: parseInt(fwId)})
+            }).then(r => r.json()).then(data => {
+                let pct = 0;
+                const interval = setInterval(() => {
+                    pct += Math.random() * 30;
+                    if (pct >= 100) { pct = 100; clearInterval(interval); }
+                    bar.style.width = pct + '%';
+                    if (pct >= 100) {
+                        status.textContent = '✅ Firmware pushed to ' + data.updated + ' device(s). Version: v' + data.version;
+                        status.style.color = '#2E7D32';
+                        // Update table
+                        data.device_ids.forEach(id => {
+                            const row = document.querySelector('[data-id="'+id+'"]');
+                            if (row) {
+                                row.dataset.fw = data.version;
+                                row.querySelector('.fw-badge-sm').textContent = data.version;
+                            }
+                        });
+                    }
+                }, 200);
+            }).catch(() => {
+                status.textContent = '❌ Failed to push firmware.';
+                status.style.color = 'var(--danger-color)';
+            });
+        }
+        </script>
     </body>
 </html>

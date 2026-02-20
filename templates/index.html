@@ -7,13 +7,12 @@
     <link rel="stylesheet" href="/static/css/style.css" />
     <link rel="stylesheet" href="/static/css/navbar.css" />
     <link rel="stylesheet" href="/static/css/footer.css" />
-    <link rel="stylesheet" href="/static/css/post.css" />
     <link rel="stylesheet" href="/static/css/common.css" />
     <link rel="stylesheet" href="/static/css/load.css">
 
     <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap' rel='stylesheet'>
 
-    <title>MultiGauge &#8212; The Future of Automotive Gauges</title>
+    <title>Dezzip &#8212; The Future of Automotive Gauges</title>
 
     <style>
       .landing-hero {
@@ -180,7 +179,7 @@
 
         <div class="hero-actions">
           <a href="/products" class="hero-btn hero-btn--primary">Shop Now</a>
-          <a href="/editor" class="hero-btn hero-btn--outline">Open Editor &#8594;</a>
+          <a href="/devices" class="hero-btn hero-btn--outline">My Devices &#8594;</a>
         </div>
       </div>
     </section>
@@ -274,23 +273,12 @@
       <div class="margined">
         <div class="section-header reveal">
           <span class="eyebrow">Community</span>
-          <h2>Community Creations</h2>
-          <p>See what the community is making</p>
+          <h2>Join the Community</h2>
+          <p>Connect with car enthusiasts on Discord</p>
         </div>
-
-        {% if posts %}
-          <div class="post-grid reveal">
-            {% import 'macros/post_card.html' as post_macros %}
-            {% for post in posts %}
-              {{ post_macros.render_post(post, show_user=True, show_feature_star=True) }}
-            {% endfor %}
-          </div>
-          <div style="text-align:center;margin-top:var(--space-xl);" class="reveal">
-            <a href="/workshop" class="hero-btn hero-btn--outline" style="display:inline-block;">Browse Workshop &#8594;</a>
-          </div>
-        {% else %}
-          <p style="text-align:center;color:#6b6b80;" class="reveal">No posts yet. Be the first to create!</p>
-        {% endif %}
+        <div style="text-align:center;" class="reveal">
+          <a href="https://discord.gg/ZS9GjqUF" target="_blank" class="hero-btn hero-btn--outline" style="display:inline-block;">Join Discord &#8594;</a>
+        </div>
       </div>
     </section>
 
@@ -299,14 +287,12 @@
         <div class="cta-card reveal">
           <h2>Ready to upgrade your dash?</h2>
           <p>Join the community of enthusiasts redefining their cockpit experience.</p>
-          <a href="/products" class="hero-btn hero-btn--primary">Get Your MultiGauge</a>
+          <a href="/products" class="hero-btn hero-btn--primary">Get Your Dezzip</a>
         </div>
       </div>
     </section>
 
     {% include 'footer.html' %}
-
-    <script src="/static/js/gaugePreview.js" type="module"></script>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {

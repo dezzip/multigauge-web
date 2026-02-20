@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="/static/css/footer.css" />
         <link rel="stylesheet" href="/static/css/common.css" />
         <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
-        <title>Orders - MultiGauge</title>
+        <title>Orders - Dezzip</title>
         <style>
             .order-card {
                 display: flex;
@@ -49,6 +49,11 @@
             .order-card:hover .order-arrow {
                 color: var(--accent-color);
                 transform: translateX(4px);
+            }
+
+            @media (max-width: 640px) {
+                .order-card { flex-direction: column; align-items: flex-start; gap: 8px; }
+                .order-arrow { align-self: flex-end; }
             }
         </style>
     </head>

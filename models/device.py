@@ -14,6 +14,11 @@ class Device(db.Model):
     last_seen_at     = db.Column(db.DateTime, nullable=True)
     registered_at    = db.Column(db.DateTime, default=datetime.utcnow)
     config_json      = db.Column(db.Text, nullable=True)
+    tag              = db.Column(db.String(30), nullable=True, default=None)
+    latitude         = db.Column(db.Float, nullable=True)
+    longitude        = db.Column(db.Float, nullable=True)
+    module_type      = db.Column(db.String(30), nullable=True, default='ESP32-S3')
+    country          = db.Column(db.String(5), nullable=True, default='FR')
 
     user          = db.relationship('User', backref=db.backref('devices', lazy=True))
     assigned_post = db.relationship('Post', backref=db.backref('assigned_devices', lazy=True))

@@ -8,8 +8,16 @@
     <link rel="stylesheet" href="/static/css/navbar.css" />
     <link rel="stylesheet" href="/static/css/footer.css" />
     <link rel="stylesheet" href="/static/css/common.css" />
-    <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
-    <title>{{ user.username }} - MultiGauge</title>
+    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
+    <title>{{ user.username }} - Dezzip</title>
+    <style>
+        @media (max-width: 640px) {
+            .page-header-content .title { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .page-header-content .title .flex-row.items-center.gap-lg { gap: 12px; }
+            .page-header-content .title .flex-row.items-center.gap-lg img { width: 56px; height: 56px; }
+            .page-header-content .title .flex-row.gap-xl { gap: 16px; }
+        }
+    </style>
   </head>
   <body>
     {% include 'navbar.html' %}
@@ -51,7 +59,6 @@
       {% if user_posts %}
         <div class="flex-row justify-between items-center" style="padding: var(--space-lg) 0 var(--space-sm);">
           <h2 style="font-size: var(--font-size-xl);">Latest Posts</h2>
-          <a href="{{ url_for('workshop.workshop', user=user.id) }}" style="color: var(--accent-color); font-weight: 500;">See all</a>
         </div>
         <div class="post-grid">
           {% import 'macros/post_card.html' as post_macros %}

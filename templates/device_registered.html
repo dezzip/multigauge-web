@@ -41,12 +41,34 @@
                 </div>
 
                 <div class="p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
-                    <h3>ESP32 Setup</h3>
+                    <h3>Connect your ESP32 to the cloud</h3>
                     <br>
-                    <p style="color: #aaa;">Add this to your ESP32 code:</p>
+                    <p style="color: #aaa; font-size: 13px;">Follow these steps to complete setup via the ESP32 captive portal:</p>
                     <br>
-                    <code style="background-color: var(--background-color); padding: 12px; border-radius: var(--common-border-radius); display: block; font-size: 13px; font-family: monospace; white-space: pre; overflow-x: auto;">#define API_TOKEN "{{ token }}"
-#define API_BASE  "https://your-domain.com/api/v1"</code>
+                    <ol style="color: #ccc; line-height: 2.2; padding-left: 20px; font-size: 13px;">
+                        <li>Power on your gauge cluster (first boot creates a WiFi hotspot)</li>
+                        <li>On your phone/PC, connect to the WiFi network: <code style="background: var(--background-color); padding: 2px 6px; border-radius: 4px; color: #4CAF50;">GaugeCluster</code> &nbsp;(password: <code style="background: var(--background-color); padding: 2px 6px; border-radius: 4px; color: #4CAF50;">12345678</code>)</li>
+                        <li>Open <code style="background: var(--background-color); padding: 2px 6px; border-radius: 4px; color: #4CAF50;">http://192.168.4.1/setup</code> in your browser</li>
+                        <li>Enter your home WiFi credentials and tap <strong>Connect</strong></li>
+                        <li>Expand <strong>Cloud Server</strong> and fill in the three fields:</li>
+                    </ol>
+                    <br>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <tr style="border-bottom: 1px solid #333;">
+                            <td style="padding: 8px 0; color: #aaa; width: 110px;">Server URL</td>
+                            <td><code id="server-url-hint" style="background: var(--background-color); padding: 4px 8px; border-radius: 4px; color: #4CAF50; word-break: break-all; font-size: 12px;"></code></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #333;">
+                            <td style="padding: 8px 0; color: #aaa;">Device ID</td>
+                            <td><code style="background: var(--background-color); padding: 4px 8px; border-radius: 4px; color: #4CAF50; font-size: 12px;">{{ device.hardware_id }}</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #aaa;">Token</td>
+                            <td><code style="background: var(--background-color); padding: 4px 8px; border-radius: 4px; color: #4CAF50; font-size: 12px; word-break: break-all;">{{ token }}</code></td>
+                        </tr>
+                    </table>
+                    <br>
+                    <p style="color: #666; font-size: 12px;">Once saved, the device will appear Online in your dashboard within 60 seconds.</p>
                 </div>
 
                 <a href="{{ url_for('devices.my_devices') }}">
@@ -66,6 +88,12 @@
                         document.getElementById('copy-btn').textContent = 'Copy';
                     }, 2000);
                 });
+            }
+
+            // Build heartbeat URL from current page origin
+            const hintEl = document.getElementById('server-url-hint');
+            if (hintEl) {
+                hintEl.textContent = window.location.origin + '/api/v1/heartbeat';
             }
         </script>
     </body>

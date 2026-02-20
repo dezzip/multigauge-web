@@ -4,17 +4,19 @@
 body.login-body {
     background-color: #050510;
     margin: 0;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
     font-family: var(--common-font-family);
 }
 
 .login-page {
     display: flex;
-    height: 100vh;
+    min-height: calc(100vh - var(--navbar-height, 64px));
     width: 100%;
     position: relative;
     perspective: 1200px;
+    padding: var(--space-lg, 24px);
+    box-sizing: border-box;
 }
 
 /* ===== ANIMATED BACKGROUND ===== */

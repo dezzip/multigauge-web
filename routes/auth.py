@@ -9,7 +9,7 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for("workshop.workshop"))
+        return redirect(url_for("main.home"))
 
     form = RegisterForm()
     if form.validate_on_submit():
@@ -29,7 +29,7 @@ def register():
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("workshop.workshop"))
+        return redirect(url_for("main.home"))
 
     form = LoginForm()
 
@@ -40,7 +40,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             flash("Logged in successfully!", "success")
-            return redirect(url_for("workshop.workshop"))
+            return redirect(url_for("main.home"))
         else:
             flash("Login failed. Check your email and password.", "danger")
 

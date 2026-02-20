@@ -74,3 +74,10 @@
     transform: translate(2px, 2px);
     box-shadow: var(--brutal-shadow-active);
 }
+
+/* ===== RESPONSIVE PRODUCTS ===== */
+@media (max-width: 640px) {
+    .product-grid { grid-template-columns: 1fr; gap: var(--space-md); }
+    .product { aspect-ratio: auto; }
+    .product-info-container { padding: var(--space-md); }
+}

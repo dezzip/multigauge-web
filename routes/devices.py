@@ -2,7 +2,7 @@ import json
 import secrets
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from models import db, Device, DeviceToken, Post
+from models import db, Device, DeviceToken, Post, Firmware
 
 devices_bp = Blueprint('devices', __name__)
 
@@ -11,7 +11,14 @@ devices_bp = Blueprint('devices', __name__)
 @login_required
 def my_devices():
     devices = Device.query.filter_by(user_id=current_user.id).all()
-    return render_template('devices.html', devices=devices)
+    # Get latest active firmware version for check-update
+    active_fw = Firmware.query.filter_by(is_active=True).first()
+    latest_fw = active_fw.version if active_fw else None
+    if not latest_fw:
+        # Fallback: get the newest firmware by version
+        newest = Firmware.query.order_by(Firmware.uploaded_at.desc()).first()
+        latest_fw = newest.version if newest else None
+    return render_template('devices.html', devices=devices, latest_firmware=latest_fw)
 
 
 @devices_bp.route('/devices/register', methods=['GET', 'POST'])
@@ -20,21 +27,46 @@ def register_device():
     if request.method == 'POST':
         hardware_id = request.form.get('hardware_id', '').strip().upper()
         name = request.form.get('name', '').strip()
+        is_ajax = request.form.get('ajax') == '1'
 
         if not hardware_id:
+            if is_ajax:
+                return jsonify({'status': 'error', 'error': 'Hardware ID (MAC address) is required.'}), 400
             flash('Hardware ID (MAC address) is required.', 'danger')
             return redirect(url_for('devices.register_device'))
 
         existing = Device.query.filter_by(hardware_id=hardware_id).first()
         if existing:
+            if is_ajax:
+                return jsonify({'status': 'error', 'error': 'This device is already registered.'}), 400
             flash('This device is already registered.', 'danger')
             return redirect(url_for('devices.register_device'))
 
         device = Device(
             hardware_id=hardware_id,
             name=name or f'Device {hardware_id[-5:]}',
-            user_id=current_user.id
+            user_id=current_user.id,
+            module_type=request.form.get('module_type', 'ESP32-S3').strip() or 'ESP32-S3',
+            tag=request.form.get('usage', '').strip() or None,
         )
+
+        # Store car info in config_json
+        car_brand = request.form.get('car_brand', '').strip()
+        car_model = request.form.get('car_model', '').strip()
+        car_year = request.form.get('car_year', '').strip()
+        usage = request.form.get('usage', '').strip()
+        if car_brand or car_model or car_year or usage:
+            import json as _json
+            extra = {}
+            if car_brand: extra['car_brand'] = car_brand
+            if car_model: extra['car_model'] = car_model
+            if car_year: extra['car_year'] = car_year
+            if usage: extra['usage'] = usage
+            # Merge with default config
+            config = DEFAULT_ESP_CONFIG.copy()
+            config['vehicle'] = extra
+            device.config_json = _json.dumps(config)
+
         db.session.add(device)
         db.session.flush()
 
@@ -46,6 +78,9 @@ def register_device():
         )
         db.session.add(token)
         db.session.commit()
+
+        if is_ajax:
+            return jsonify({'status': 'ok', 'device_id': device.id, 'token': token_str}), 200
 
         flash('Device registered successfully!', 'success')
         return render_template('device_registered.html', device=device, token=token_str)
@@ -114,6 +149,43 @@ def regenerate_token(device_id):
 
     flash('New token generated. Update your ESP32 with the new token.', 'success')
     return render_template('device_registered.html', device=device, token=token_str)
+
+
+@devices_bp.route('/devices/<int:device_id>/rename', methods=['POST'])
+@login_required
+def rename_device(device_id):
+    device = Device.query.get_or_404(device_id)
+    if device.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json(silent=True)
+    if not data or not data.get('name', '').strip():
+        return jsonify({'error': 'Name is required'}), 400
+
+    name = data['name'].strip()[:40]
+    device.name = name
+    db.session.commit()
+    return jsonify({'status': 'ok', 'name': device.name}), 200
+
+
+@devices_bp.route('/devices/<int:device_id>/tag', methods=['POST'])
+@login_required
+def update_device_tag(device_id):
+    device = Device.query.get_or_404(device_id)
+    if device.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json(silent=True)
+    if not data or 'tag' not in data:
+        return jsonify({'error': 'Missing tag'}), 400
+
+    allowed = ['production', 'test', 'vehicle', 'lab']
+    if data['tag'] not in allowed:
+        return jsonify({'error': 'Invalid tag'}), 400
+
+    device.tag = data['tag']
+    db.session.commit()
+    return jsonify({'status': 'ok', 'tag': device.tag}), 200
 
 
 @devices_bp.route('/devices/<int:device_id>/delete', methods=['POST'])

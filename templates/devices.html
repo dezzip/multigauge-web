@@ -8,7 +8,146 @@
         <link rel="stylesheet" href="/static/css/footer.css" />
         <link rel="stylesheet" href="/static/css/common.css" />
         <link href='https://fonts.googleapis.com/css?family=Inter:wght@300;400;500;600;700' rel='stylesheet'>
-        <title>My Devices - MultiGauge</title>
+        <title>My Devices - Dezzip</title>
+        <style>
+            /* Device cards */
+            .devices-list { display:flex; flex-direction:column; gap:10px; max-width:800px; }
+
+            .device-card {
+                display:flex; align-items:center; justify-content:space-between;
+                padding:18px 22px;
+                background:var(--card-bg);
+                border:var(--brutal-border);
+                border-radius:var(--brutal-radius);
+                box-shadow:var(--brutal-shadow-sm);
+                transition:all .15s;
+                position:relative;
+            }
+            .device-card:hover {
+                box-shadow:var(--brutal-shadow-hover);
+                transform:translate(-2px,-2px);
+            }
+
+            .device-card-left { display:flex; align-items:center; gap:16px; flex:1; min-width:0; }
+
+            /* Status dot */
+            .status-dot {
+                width:12px; height:12px; border-radius:50%; flex-shrink:0;
+                border:2px solid var(--card-border);
+            }
+            .status-dot.online { background:#4CAF50; box-shadow:0 0 8px rgba(76,175,80,.4); }
+            .status-dot.offline { background:var(--text-dim); }
+
+            .device-info { min-width:0; }
+            .device-info-name {
+                font-weight:700; font-size:15px; color:var(--text-color);
+                white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+            }
+            .device-info-sub {
+                font-size:12px; color:var(--text-muted); margin-top:2px;
+                display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+            }
+            .device-info-sub span { white-space:nowrap; }
+
+            .fw-badge {
+                display:inline-block; padding:2px 10px;
+                background:var(--lavender-light); color:var(--accent-color);
+                border-radius:20px; font-size:11px; font-weight:700;
+                border:1.5px solid var(--lavender);
+            }
+
+            .module-badge {
+                display:inline-block; padding:2px 8px;
+                background:var(--darker-background-color); color:var(--text-muted);
+                border-radius:6px; font-size:10px; font-weight:600;
+                letter-spacing:.3px;
+            }
+
+            /* ⋯ menu */
+            .dots-btn {
+                width:36px; height:36px; border:none; background:none;
+                font-size:22px; color:var(--text-muted); cursor:pointer;
+                border-radius:8px; display:flex; align-items:center; justify-content:center;
+                transition:all .15s; flex-shrink:0; letter-spacing:2px;
+            }
+            .dots-btn:hover { background:var(--lavender-light); color:var(--accent-color); }
+
+            .dots-menu {
+                position:absolute; top:calc(100% + 4px); right:8px;
+                background:var(--card-bg); border:var(--brutal-border);
+                border-radius:var(--brutal-radius);
+                box-shadow:var(--brutal-shadow);
+                min-width:200px; z-index:100;
+                display:none; overflow:hidden;
+            }
+            .dots-menu.open { display:block; animation:menuIn .12s ease; }
+
+            @keyframes menuIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+
+            .dots-menu-item {
+                display:flex; align-items:center; gap:10px;
+                padding:12px 18px; font-size:13px; font-weight:500;
+                color:var(--text-color); cursor:pointer;
+                transition:background .1s; border:none; background:none;
+                width:100%; text-align:left; font-family:inherit;
+            }
+            .dots-menu-item:hover { background:var(--lavender-light); }
+            .dots-menu-item.danger { color:var(--danger-color); }
+            .dots-menu-item.danger:hover { background:var(--danger-bg); }
+            .dots-menu-sep { height:1px; background:var(--glass-border); margin:0; }
+
+            /* Rename modal */
+            .modal-overlay {
+                position:fixed; inset:0; background:rgba(26,26,46,.4);
+                z-index:2000; display:none; align-items:center; justify-content:center;
+                backdrop-filter:blur(4px);
+            }
+            .modal-overlay.open { display:flex; }
+            .modal-box {
+                background:var(--card-bg); border:var(--brutal-border);
+                border-radius:var(--brutal-radius); box-shadow:var(--brutal-shadow-lg);
+                padding:28px 32px; width:100%; max-width:400px;
+            }
+            .modal-box h3 { margin:0 0 16px; font-size:18px; }
+            .modal-input {
+                width:100%; padding:10px 14px; font-size:14px;
+                border:var(--brutal-border); border-radius:8px;
+                font-family:inherit; box-sizing:border-box;
+                outline:none; transition:border-color .15s;
+            }
+            .modal-input:focus { border-color:var(--accent-color); }
+            .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:18px; }
+
+            /* Update toast */
+            .update-toast {
+                position:fixed; bottom:24px; right:24px;
+                background:var(--card-bg); border:var(--brutal-border);
+                border-radius:var(--brutal-radius); box-shadow:var(--brutal-shadow);
+                padding:16px 22px; z-index:3000; display:none;
+                max-width:340px;
+            }
+            .update-toast.show { display:block; animation:menuIn .2s ease; }
+            .update-toast p { margin:0; font-size:13px; }
+            .update-toast strong { font-size:14px; display:block; margin-bottom:4px; }
+
+            /* Empty state */
+            .empty-state {
+                text-align:center; padding:60px 20px;
+                color:var(--text-muted);
+            }
+            .empty-state-icon { font-size:48px; margin-bottom:16px; }
+            .empty-state p { font-size:15px; margin-bottom:20px; }
+
+            /* Responsive */
+            @media (max-width: 640px) {
+                .device-card { padding:14px 16px; flex-wrap:wrap; gap:10px; }
+                .device-card-left { gap:12px; }
+                .device-info-sub { flex-direction:column; gap:4px; }
+                .dots-menu { right:0; min-width:180px; }
+                .modal-box { margin:0 12px; padding:22px 18px; }
+                .update-toast { left:12px; right:12px; bottom:12px; max-width:none; }
+            }
+        </style>
     </head>
     <body>
         {% include 'navbar.html' %}
@@ -16,7 +155,7 @@
         <div class="page">
             <div class="page-header">
                 <div class="page-header-content margined">
-                    <div class="title">
+                    <div class="title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                         <h1>My Devices</h1>
                         <a href="{{ url_for('devices.register_device') }}">
                             <button class="btn btn-primary">+ Register Device</button>
@@ -38,48 +177,156 @@
             {% endwith %}
 
             {% if devices %}
-                <div class="flex-col gap-common" style="padding: var(--space-md) 0;">
+                <div class="devices-list">
                     {% for device in devices %}
-                        <div class="flex-row items-center justify-between p-common" style="background-color: var(--darker-background-color); border-radius: var(--common-border-radius);">
-                            <div class="flex-row items-center gap-common">
-                                <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ '#4CAF50' if device.is_online() else 'var(--text-dim)' }};"></div>
-                                <div class="flex-col">
-                                    <h3 style="font-size: var(--font-size-base); font-weight: 600;">{{ device.name or device.hardware_id }}</h3>
-                                    <p style="color: var(--text-dim); font-size: var(--font-size-xs);">{{ device.hardware_id }}</p>
+                        <div class="device-card" data-device-id="{{ device.id }}">
+                            <div class="device-card-left">
+                                <div class="status-dot {{ 'online' if device.is_online() else 'offline' }}"></div>
+                                <div class="device-info">
+                                    <div class="device-info-name" id="name-{{ device.id }}">{{ device.name or device.hardware_id }}</div>
+                                    <div class="device-info-sub">
+                                        <span>{{ device.hardware_id }}</span>
+                                        <span class="module-badge">{{ device.module_type or 'ESP32-S3' }}</span>
+                                        <span class="fw-badge">{{ device.firmware_version or 'v2.0.0' }}</span>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="flex-col text-center">
-                                <p style="font-size: var(--font-size-xs); color: var(--text-dim);">Gauge</p>
-                                <p style="font-size: var(--font-size-sm);">{{ device.assigned_post.title if device.assigned_post else 'None' }}</p>
-                            </div>
-
-                            <div class="flex-col text-center">
-                                <p style="font-size: var(--font-size-xs); color: var(--text-dim);">Firmware</p>
-                                <p style="font-size: var(--font-size-sm);">{{ device.firmware_version or 'Unknown' }}</p>
-                            </div>
-
-                            <div class="flex-row gap-sm">
-                                <a href="{{ url_for('devices.configure_device', device_id=device.id) }}">
-                                    <button class="btn btn-primary btn-sm">Configure</button>
-                                </a>
-                                <a href="{{ url_for('devices.assign_gauge', device_id=device.id) }}">
-                                    <button class="btn btn-secondary btn-sm">Assign</button>
-                                </a>
-                                <a href="{{ url_for('devices.view_device', device_id=device.id) }}">
-                                    <button class="btn btn-ghost btn-sm">Details</button>
-                                </a>
+                            <button class="dots-btn" onclick="toggleMenu(event, {{ device.id }})">⋯</button>
+                            <div class="dots-menu" id="menu-{{ device.id }}">
+                                <button class="dots-menu-item" onclick="openRename({{ device.id }}, '{{ (device.name or device.hardware_id)|e }}')">
+                                    ✏️ Rename
+                                </button>
+                                <button class="dots-menu-item" onclick="window.location='/devices/{{ device.id }}'">
+                                    📋 Details
+                                </button>
+                                <button class="dots-menu-item" onclick="window.location='/devices/{{ device.id }}/configure'">
+                                    ⚙️ Configure
+                                </button>
+                                <button class="dots-menu-item" onclick="checkUpdate({{ device.id }}, '{{ device.firmware_version or 'v2.0.0' }}')">
+                                    🔄 Check for Update
+                                </button>
+                                <div class="dots-menu-sep"></div>
+                                <button class="dots-menu-item danger" onclick="confirmDelete({{ device.id }}, '{{ (device.name or device.hardware_id)|e }}')">
+                                    🗑️ Delete
+                                </button>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
-                <div style="text-align: center; padding: var(--space-2xl) 0;">
-                    <p style="color: var(--text-muted);">No devices registered yet. Register your ESP32 to get started!</p>
+                <div class="empty-state">
+                    <div class="empty-state-icon">📡</div>
+                    <p>No devices registered yet.<br>Register your ESP32 to get started!</p>
+                    <a href="{{ url_for('devices.register_device') }}">
+                        <button class="btn btn-primary">+ Register Device</button>
+                    </a>
                 </div>
             {% endif %}
         </div>
 
+        <!-- Rename Modal -->
+        <div class="modal-overlay" id="renameModal">
+            <div class="modal-box">
+                <h3>Rename Device</h3>
+                <input class="modal-input" type="text" id="renameInput" placeholder="New name..." maxlength="40" autocomplete="off">
+                <div class="modal-actions">
+                    <button class="btn btn-ghost btn-sm" onclick="closeRename()">Cancel</button>
+                    <button class="btn btn-primary btn-sm" onclick="submitRename()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Toast -->
+        <div class="update-toast" id="updateToast">
+            <strong id="toastTitle"></strong>
+            <p id="toastMsg"></p>
+        </div>
+
+        <!-- Delete form (hidden) -->
+        <form id="deleteForm" method="POST" style="display:none;"></form>
+
         {% include 'footer.html' %}
+
+        <script>
+        // === MENU ===
+        let openMenuId = null;
+        function toggleMenu(e, id) {
+            e.stopPropagation();
+            document.querySelectorAll('.dots-menu.open').forEach(m => m.classList.remove('open'));
+            const menu = document.getElementById('menu-' + id);
+            if (openMenuId === id) { openMenuId = null; return; }
+            menu.classList.add('open');
+            openMenuId = id;
+        }
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dots-menu.open').forEach(m => m.classList.remove('open'));
+            openMenuId = null;
+        });
+
+        // === RENAME ===
+        let renameDeviceId = null;
+        function openRename(id, currentName) {
+            renameDeviceId = id;
+            document.getElementById('renameInput').value = currentName;
+            document.getElementById('renameModal').classList.add('open');
+            setTimeout(() => document.getElementById('renameInput').focus(), 100);
+        }
+        function closeRename() {
+            document.getElementById('renameModal').classList.remove('open');
+            renameDeviceId = null;
+        }
+        function submitRename() {
+            const name = document.getElementById('renameInput').value.trim();
+            if (!name || !renameDeviceId) return;
+            fetch('/devices/' + renameDeviceId + '/rename', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name })
+            }).then(r => r.json()).then(data => {
+                if (data.status === 'ok') {
+                    document.getElementById('name-' + renameDeviceId).textContent = data.name;
+                    showToast('✅ Renamed', 'Device renamed to "' + data.name + '"');
+                } else {
+                    showToast('❌ Error', data.error || 'Failed to rename');
+                }
+                closeRename();
+            }).catch(() => { showToast('❌ Error', 'Network error'); closeRename(); });
+        }
+        document.getElementById('renameInput').addEventListener('keydown', e => { if (e.key === 'Enter') submitRename(); if (e.key === 'Escape') closeRename(); });
+
+        // === CHECK UPDATE ===
+        function checkUpdate(id, currentFw) {
+            const latest = '{{ latest_firmware or "" }}';
+            document.querySelectorAll('.dots-menu.open').forEach(m => m.classList.remove('open'));
+            openMenuId = null;
+            if (!latest) {
+                showToast('ℹ️ No firmware', 'No firmware version available on server.');
+            } else if (currentFw.replace('v','') === latest.replace('v','')) {
+                showToast('✅ Up to date', 'Firmware ' + currentFw + ' is the latest version.');
+            } else {
+                showToast('🔄 Update available', 'Current: ' + currentFw + ' → Latest: v' + latest.replace('v','') + '. Go to device details to install.');
+            }
+        }
+
+        // === DELETE ===
+        function confirmDelete(id, name) {
+            document.querySelectorAll('.dots-menu.open').forEach(m => m.classList.remove('open'));
+            openMenuId = null;
+            if (confirm('Delete device "' + name + '"? This cannot be undone.')) {
+                const form = document.getElementById('deleteForm');
+                form.action = '/devices/' + id + '/delete';
+                form.submit();
+            }
+        }
+
+        // === TOAST ===
+        function showToast(title, msg) {
+            const t = document.getElementById('updateToast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMsg').textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 4000);
+        }
+        </script>
     </body>
 </html>

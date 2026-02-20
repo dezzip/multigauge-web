@@ -3,7 +3,7 @@ from flask_login import LoginManager
 from models import db, bcrypt, User, Product
 from datetime import datetime, timedelta
 
-from routes import auth_bp, cart_bp, main_bp, admin_bp, users_bp, payment_bp, workshop_bp, products_bp, api_bp, devices_bp
+from routes import auth_bp, cart_bp, main_bp, admin_bp, users_bp, payment_bp, products_bp, api_bp, devices_bp
 
 import stripe
 import os
@@ -42,7 +42,6 @@ app.register_blueprint(main_bp)
 app.register_blueprint(payment_bp)
 app.register_blueprint(products_bp)
 app.register_blueprint(users_bp)
-app.register_blueprint(workshop_bp)
 app.register_blueprint(api_bp)
 app.register_blueprint(devices_bp)
 
